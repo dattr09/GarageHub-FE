@@ -105,15 +105,6 @@ const LoginAdmin = () => {
                         <div className="mx-2 text-blue-300 text-xl">✧</div>
                         <div className="flex-grow border-t border-blue-100"></div>
                     </div>
-                    {/* Social login */}
-                    <div className="flex w-full gap-4">
-                        <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full border border-blue-200 bg-white bg-opacity-60 text-blue-600 hover:bg-blue-50 transition">
-                            Google
-                        </button>
-                        <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full border border-blue-200 bg-white bg-opacity-60 text-blue-600 hover:bg-blue-50 transition">
-                            Twitter
-                        </button>
-                    </div>
                     {/* Register */}
                     <div className="text-center text-blue-500 text-sm">
                         New to <span className="font-semibold text-blue-700">Garage Hub</span>?{" "}

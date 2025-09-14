@@ -1,3 +1,4 @@
+// Layout dành cho Admin (sidebar trái)
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaSearch, FaUserCircle, FaChartBar, FaRegFileAlt, FaRegComments, FaRegChartBar, FaEnvelope, FaSignOutAlt } from "react-icons/fa";
@@ -35,9 +36,9 @@ const AdminLayout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-500 text-white flex flex-col py-8 px-6 rounded-tr-3xl rounded-br-3xl">
+      <aside className="w-64 bg-purple-600 text-white flex flex-col py-8 px-6 rounded-tr-3xl rounded-br-3xl">
         {/* Logo */}
-        <div className="flex items-center mb-10">
+        <div className="flex items-center">
           <img
             src="/logo_garagehub.png"
             alt="Garage Hub Logo"
@@ -54,12 +55,12 @@ const AdminLayout = ({ children }) => {
                   to={item.path}
                   className={`relative flex items-center rounded-xl px-4 py-3 font-semibold transition ${
                     location.pathname === item.path
-                      ? "bg-white text-blue-700 shadow-lg"
-                      : "hover:bg-white hover:bg-opacity-10 text-white"
+                      ? "bg-transparent text-white shadow-lg"
+                      : "hover:bg-white/60 hover:bg-opacity-20 text-white"
                   }`}
                 >
                   {location.pathname === item.path && (
-                    <span className="absolute -left-3 top-1/2 -translate-y-1/2 w-2 h-8 bg-blue-700 rounded-xl shadow"></span>
+                    <span className="absolute -left-3 top-1/2 -translate-y-1/2 w-2 h-8 bg-white/50 rounded-xl shadow"></span>
                   )}
                   {item.icon}
                   {item.name}
@@ -81,10 +82,10 @@ const AdminLayout = ({ children }) => {
             </div>
           </button>
           {showMenu && (
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-36 bg-white rounded-xl shadow-lg z-10">
+            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-36 bg-white/50 rounded-xl shadow-lg z-10">
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 text-blue-600 hover:bg-blue-50 rounded-xl transition"
+                className="flex items-center w-full px-4 py-3 text-purple-700 bg-purple-100/30 hover:bg-purple-200/50 rounded-xl transition"
               >
                 <FaSignOutAlt className="mr-2" /> Logout
               </button>
