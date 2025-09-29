@@ -1,22 +1,21 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import "./App.css";
-import AuthContainer from "./pages/AuthContainer";
-
-// Hàm kiểm tra trạng thái đăng nhập
-// function PrivateRoute({ children }) {
-//   const isAuthenticated = !!localStorage.getItem("token");
-//   return isAuthenticated ? children : <Navigate to="/login" replace />;
-// }
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function App() {
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/ping`)
+      .then((res) => setMsg(res.data.message))
+      .catch((err) => console.error(err));
+  }, []);
+
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Các route công khai */}
-        <Route path="/login" element={<AuthContainer />} />
-        <Route path="/register" element={<AuthContainer />} />
-      </Routes>
-    </BrowserRouter>
+    <div>
+      <h1>FE - BE Connection Test</h1>
+      <p>Response: {msg}</p>
+    </div>
   );
 }
 
