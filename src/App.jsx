@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
+import AuthContainer from "./pages/AuthContainer";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 function App() {
-  const [msg, setMsg] = useState("");
-
-  useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/ping`)
-      .then((res) => setMsg(res.data.message))
-      .catch((err) => console.error(err));
-  }, []);
-
   return (
-    <div>
-      <h1>FE - BE Connection Test</h1>
-      <p>Response: {msg}</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Route mặc định chuyển hướng đến trang Login */}
+        <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Các route công khai */}
+        <Route path="/login" element={<AuthContainer />} />
+        <Route path="/register" element={<AuthContainer />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

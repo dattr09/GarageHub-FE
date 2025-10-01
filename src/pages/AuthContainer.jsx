@@ -42,11 +42,11 @@ export default function AuthContainer() {
             <motion.img
               src={
                 isRegister
-                  ? "/logo_garagehub.png"
-                  : "/logo_garagehub.png"
+                  ? "/Logo_GarageHub.png"
+                  : "/Logo_GarageHub.png"
               }
               alt="GarageMaster Logo"
-              style={{ width: "200px", height: "200px", objectFit: "contain" }}
+              style={{ width: "280px", height: "280px", objectFit: "contain" }}
               className="mb-6 rounded-full"
               key={isRegister ? "logo-register" : "logo-login"}
               initial={{ x: isRegister ? -500 : 500, opacity: 0 }}
