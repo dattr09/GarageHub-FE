@@ -1,8 +1,27 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import { AuthAPI } from "../services/api";
 import { toast } from "react-hot-toast";
+import { FaUser, FaPhone, FaMapMarkerAlt, FaEnvelope, FaEye, FaEyeSlash, FaTimesCircle } from "react-icons/fa";
+
+const containerVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: {
+            staggerChildren: 0.12,
+            delayChildren: 0.1,
+        },
+    },
+    exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 const RegisterPage = () => {
     const [fullName, setFullName] = useState("");
@@ -13,12 +32,18 @@ const RegisterPage = () => {
     const [password, setPassword] = useState("");
     const [focusField, setFocusField] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setSuccessMsg("");
+        setErrorMsg("");
         try {
-            const response = await api.post("/auth/register", {
+            const response = await AuthAPI.register({
                 fullName,
                 dateOfBirth,
                 phoneNumber,
@@ -28,37 +53,77 @@ const RegisterPage = () => {
             });
 
             if (response.status === 201) {
-                toast.success(response.data.message);
-
-                // Lưu email vào localStorage
+                setSuccessMsg(response.data.message || "Đăng ký thành công!");
+                toast.success(response.data.message, { duration: 3000 });
                 localStorage.setItem("emailForVerification", email);
-
-                // Chuyển hướng đến trang xác thực email
-                navigate("/verify-email");
+                setTimeout(() => {
+                    setSuccessMsg("");
+                    navigate("/verify-email");
+                }, 3000);
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || "Đăng ký thất bại!");
+            setErrorMsg("Đăng ký thất bại!");
+            toast.error("Đăng ký thất bại!");
+            setTimeout(() => setErrorMsg(""), 3000);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.4 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             className="w-full px-8 py-4 relative"
         >
-            <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow">
+            <AnimatePresence>
+                {successMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-blue-200 text-green-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap"
+                        style={{ minWidth: 280, maxWidth: "90vw" }}
+                    >
+                        <svg
+                            className="w-6 h-6 text-green-700"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="truncate">{successMsg}</span>
+                    </motion.div>
+                )}
+                {errorMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-red-200 text-red-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        style={{ minWidth: 280, maxWidth: "90vw" }}
+                    >
+                        <FaTimesCircle className="text-red-500 text-2xl" />
+                        <span className="truncate text-center">{errorMsg}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <motion.h2
+                variants={itemVariants}
+                className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow"
+            >
                 Đăng ký
-            </h2>
-            <form onSubmit={handleRegister} className="space-y-4">
-                {/* Họ và Tên */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 }}
-                >
+            </motion.h2>
+            <motion.form
+                variants={itemVariants}
+                onSubmit={handleRegister}
+                className="space-y-4"
+            >
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="text"
@@ -75,14 +140,20 @@ const RegisterPage = () => {
                                 }
                                 placeholder-gray-400`}
                         />
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: focusField === "fullName" ? 1 : 0,
+                                x: focusField === "fullName" ? 0 : -10,
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
+                            transition={{ duration: 0.2 }}
+                        >
+                            <FaUser />
+                        </motion.span>
                     </div>
                 </motion.div>
-                {/* Ngày sinh */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                >
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="date"
@@ -100,12 +171,7 @@ const RegisterPage = () => {
                         />
                     </div>
                 </motion.div>
-                {/* Số điện thoại */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                >
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="text"
@@ -122,14 +188,20 @@ const RegisterPage = () => {
                                 }
                                 placeholder-gray-400`}
                         />
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: focusField === "phoneNumber" ? 1 : 0,
+                                x: focusField === "phoneNumber" ? 0 : -10,
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
+                            transition={{ duration: 0.2 }}
+                        >
+                            <FaPhone />
+                        </motion.span>
                     </div>
                 </motion.div>
-                {/* Địa chỉ */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                >
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="text"
@@ -146,14 +218,20 @@ const RegisterPage = () => {
                                 }
                                 placeholder-gray-400`}
                         />
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: focusField === "address" ? 1 : 0,
+                                x: focusField === "address" ? 0 : -10,
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
+                            transition={{ duration: 0.2 }}
+                        >
+                            <FaMapMarkerAlt />
+                        </motion.span>
                     </div>
                 </motion.div>
-                {/* Email */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
-                >
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="email"
@@ -170,14 +248,20 @@ const RegisterPage = () => {
                                 }
                                 placeholder-gray-400`}
                         />
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: focusField === "email" ? 1 : 0,
+                                x: focusField === "email" ? 0 : -10,
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
+                            transition={{ duration: 0.2 }}
+                        >
+                            <FaEnvelope />
+                        </motion.span>
                     </div>
                 </motion.div>
-                {/* Mật khẩu */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                >
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
@@ -195,7 +279,7 @@ const RegisterPage = () => {
                                 placeholder-gray-400`}
                         />
                         <span
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
+                            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
                             onClick={() => setShowPassword((v) => !v)}
                             tabIndex={0}
                             role="button"
@@ -203,33 +287,27 @@ const RegisterPage = () => {
                             style={{ padding: 0 }}
                         >
                             {showPassword ? (
-                                <i className="fas fa-eye-slash"></i>
+                                <FaEyeSlash />
                             ) : (
-                                <i className="fas fa-eye"></i>
+                                <FaEye />
                             )}
                         </span>
                     </div>
                 </motion.div>
-                {/* Nút đăng ký */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
-                >
+                <motion.div variants={itemVariants}>
                     <button
                         type="submit"
-                        className="cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 text-lg tracking-wide flex items-center justify-center gap-2"
+                        disabled={loading}
+                        className={`cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 text-lg tracking-wide flex items-center justify-center gap-2
+                        ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
                     >
-                        Đăng ký
+                        {loading ? "Đang đăng ký..." : "Đăng ký"}
                     </button>
                 </motion.div>
-            </form>
+            </motion.form>
 
-            {/* Đăng nhập */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                variants={itemVariants}
                 className="mt-8 text-center"
             >
                 <span className="text-gray-600 text-base">Đã có tài khoản?</span>

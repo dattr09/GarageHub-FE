@@ -1,45 +1,103 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import { AuthAPI } from "../services/api";
 import { toast } from "react-hot-toast";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+
+const containerVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: {
+            staggerChildren: 0.12,
+            delayChildren: 0.1,
+        },
+    },
+    exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [focusField, setFocusField] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setSuccessMsg("");
+        setErrorMsg("");
         try {
-            const response = await api.post("/auth/login", { email, password });
+            const response = await AuthAPI.login({ email, password });
+            setSuccessMsg(response.data.message || "Đăng nhập thành công!");
             toast.success(response.data.message);
-            navigate("/dashboard"); // Chuyển hướng sau khi đăng nhập thành công
+            setTimeout(() => {
+                setSuccessMsg("");
+                navigate("/dashboard");
+            }, 2000);
         } catch (error) {
+            setErrorMsg("Đăng nhập thất bại!");
             toast.error(error.response?.data?.message || "Đăng nhập thất bại!");
+            setTimeout(() => setErrorMsg(""), 3000);
         }
     };
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.4 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             className="w-full px-8 py-4 relative"
         >
-            <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow">
+            <AnimatePresence>
+                {successMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-blue-200 text-green-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        style={{ minWidth: 280, maxWidth: "90vw" }}
+                    >
+                        <FaCheckCircle className="text-green-700 text-2xl" />
+                        <span className="truncate text-center">{successMsg}</span>
+                    </motion.div>
+                )}
+                {errorMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-red-200 text-red-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        style={{ minWidth: 280, maxWidth: "90vw" }}
+                    >
+                        <FaTimesCircle className="text-red-500 text-2xl" />
+                        <span className="truncate text-center">{errorMsg}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <motion.h2
+                variants={itemVariants}
+                className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow"
+            >
                 Đăng nhập
-            </h2>
-            <form onSubmit={handleLogin} className="space-y-4">
+            </motion.h2>
+            <motion.form
+                variants={itemVariants}
+                onSubmit={handleLogin}
+                className="space-y-4"
+            >
                 {/* Email */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                >
+                <motion.div variants={itemVariants}>
                     <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
                         Email
                     </label>
@@ -69,16 +127,12 @@ const LoginPage = () => {
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
                             transition={{ duration: 0.2 }}
                         >
-                            <i className="fas fa-envelope"></i>
+                            <FaEnvelope />
                         </motion.span>
                     </div>
                 </motion.div>
                 {/* Mật khẩu */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                >
+                <motion.div variants={itemVariants}>
                     <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
                         Mật khẩu
                     </label>
@@ -108,9 +162,9 @@ const LoginPage = () => {
                             style={{ padding: 0 }}
                         >
                             {showPassword ? (
-                                <i className="fas fa-eye-slash"></i>
+                                <FaEyeSlash />
                             ) : (
-                                <i className="fas fa-eye"></i>
+                                <FaEye />
                             )}
                         </span>
                     </div>
@@ -126,11 +180,7 @@ const LoginPage = () => {
                     </div>
                 </motion.div>
                 {/* Nút đăng nhập */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                >
+                <motion.div variants={itemVariants}>
                     <button
                         type="submit"
                         className="cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 text-lg tracking-wide flex items-center justify-center gap-2"
@@ -138,17 +188,17 @@ const LoginPage = () => {
                         Đăng nhập
                     </button>
                 </motion.div>
-            </form>
+            </motion.form>
 
             {/* Phân cách "hoặc" */}
-            <div className="flex items-center my-4">
+            <motion.div variants={itemVariants} className="flex items-center my-4">
                 <div className="flex-grow h-px bg-gray-300"></div>
                 <span className="mx-4 text-gray-500 font-semibold">hoặc</span>
                 <div className="flex-grow h-px bg-gray-300"></div>
-            </div>
+            </motion.div>
 
             {/* Đăng nhập với Google hoặc Apple */}
-            <div className="flex flex-col gap-3">
+            <motion.div variants={itemVariants} className="flex flex-col gap-3">
                 <button
                     type="button"
                     className="w-full flex items-center justify-center gap-3 py-2 rounded-lg bg-white border border-gray-300 shadow hover:bg-gray-50 transition"
@@ -177,13 +227,11 @@ const LoginPage = () => {
                         Đăng nhập với Apple
                     </span>
                 </button>
-            </div>
+            </motion.div>
 
             {/* Đăng ký */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                variants={itemVariants}
                 className="mt-8 text-center"
             >
                 <span className="text-gray-600 text-base">Chưa có tài khoản?</span>

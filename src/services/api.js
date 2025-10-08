@@ -8,4 +8,10 @@ const api = axios.create({
   },
 });
 
+export const AuthAPI = {
+  login: (data) => api.post("/auth/login", data),
+  register: (data) => api.post("/auth/register", data),
+  verifyCode: (data) => api.post("/auth/verify-code", data),
+};
+
 export default api;
