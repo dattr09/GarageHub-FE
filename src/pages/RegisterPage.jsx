@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { AuthAPI } from "../services/api";
 import { toast } from "react-hot-toast";
-import { FaUser, FaPhone, FaMapMarkerAlt, FaEnvelope, FaEye, FaEyeSlash, FaTimesCircle } from "react-icons/fa";
+import { FaUser, FaPhone, FaMapMarkerAlt, FaEnvelope, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const containerVariants = {
     hidden: { opacity: 0, x: 50 },
@@ -84,19 +84,11 @@ const RegisterPage = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-blue-200 text-green-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap"
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-blue-200 text-green-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
                         style={{ minWidth: 280, maxWidth: "90vw" }}
                     >
-                        <svg
-                            className="w-6 h-6 text-green-700"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            viewBox="0 0 24 24"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="truncate">{successMsg}</span>
+                        <FaCheckCircle className="text-green-700 text-2xl" />
+                        <span className="truncate text-center">{successMsg}</span>
                     </motion.div>
                 )}
                 {errorMsg && (
