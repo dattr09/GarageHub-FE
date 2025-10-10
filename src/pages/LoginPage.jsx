@@ -112,11 +112,11 @@ const LoginPage = () => {
                             autoComplete="username"
                             placeholder="Nhập email của bạn"
                             className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "email"
-                                    ? "border-blue-500 ring-2 ring-blue-200"
-                                    : "border-gray-300 focus:border-blue-400"
-                                }
-                placeholder-gray-400`}
+        ${focusField === "email"
+                                ? "border-blue-500 ring-2 ring-blue-200"
+                                : "border-gray-300 focus:border-blue-400"
+                            }
+        placeholder-gray-400 outline-none`}
                         />
                         <motion.span
                             initial={false}
@@ -151,7 +151,7 @@ const LoginPage = () => {
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                placeholder-gray-400`}
+                placeholder-gray-400 outline-none`}
                         />
                         <span
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"

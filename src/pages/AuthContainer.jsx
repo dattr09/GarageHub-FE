@@ -28,7 +28,7 @@ export default function AuthContainer() {
       </style>
 
       <div className="flex items-center justify-center w-full min-h-screen animate-gradient-x bg-gradient-to-br from-blue-500 via-indigo-200 via-cyan-100 to-blue-200">
-        <div className="relative bg-white/60 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden max-w-4xl min-h-[650px] w-full"> 
+        <div className="relative bg-white/60 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden max-w-4xl min-h-[650px] w-full">
           <motion.div
             className="hidden md:flex flex-col items-center justify-center absolute top-0 left-0 h-full w-1/2 z-10
               bg-gradient-to-br from-blue-500 via-indigo-400 via-cyan-300 to-blue-200
@@ -47,21 +47,19 @@ export default function AuthContainer() {
               }
               alt="GarageMaster Logo"
               style={{ width: "280px", height: "280px", objectFit: "contain" }}
-              className="mb-6 rounded-full"
+              className="mb-4 rounded-full"
               key={isRegister ? "logo-register" : "logo-login"}
               initial={{ x: isRegister ? -500 : 500, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.7, ease: "easeInOut" }}
             />
 
-            <h3 className="text-3xl font-bold mb-3 text-white drop-shadow text-center tracking-wide">
-              Garage Hub
-            </h3>
             <div className="w-full flex flex-col items-center justify-center mt-2">
-              <span className="block text-base font-semibold text-blue-50 text-center tracking-wide">
-                Đam mê tốc độ, chọn Garage Hub đồng hành
+              <span className="block text-lg font-bold text-center tracking-wide">
+                Đam mê tốc độ, chọn{" "}
+                <span className="text-yellow-300">Garage Hub</span> đồng hành
               </span>
-              <span className="block text-base font-semibold text-blue-50 text-center tracking-wide mt-1">
+              <span className="block text-lg font-bold text-blue-50 text-center tracking-wide mt-1">
                 Xe ngon – Đường xa cũng hóa gần!
               </span>
             </div>

@@ -130,7 +130,7 @@ const RegisterPage = () => {
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                         <motion.span
                             initial={false}
@@ -159,7 +159,7 @@ const RegisterPage = () => {
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                     </div>
                 </motion.div>
@@ -178,7 +178,7 @@ const RegisterPage = () => {
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                         <motion.span
                             initial={false}
@@ -208,7 +208,7 @@ const RegisterPage = () => {
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                         <motion.span
                             initial={false}
@@ -238,7 +238,7 @@ const RegisterPage = () => {
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                         <motion.span
                             initial={false}
@@ -268,7 +268,7 @@ const RegisterPage = () => {
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                         <span
                             className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"

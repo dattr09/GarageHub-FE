@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useRef } from "react";
 import { AuthAPI } from "../services/api";
 import { toast } from "react-hot-toast";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaEnvelopeOpenText, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaKey, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const otpLength = 6;
 
@@ -12,7 +12,7 @@ const inputVariants = {
     unfocused: { borderColor: "#d1d5db", boxShadow: "none" },
 };
 
-const VerifyEmailPage = () => {
+const VerifyPasswordPage = () => {
     const [otp, setOtp] = useState(Array(otpLength).fill(""));
     const [focusIndex, setFocusIndex] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -20,7 +20,9 @@ const VerifyEmailPage = () => {
     const [errorMsg, setErrorMsg] = useState("");
     const inputRefs = useRef([]);
     const navigate = useNavigate();
-    const email = localStorage.getItem("emailForVerification");
+    const location = useLocation();
+    const email = location.state?.email;
+
     const handleChange = (e, idx) => {
         const val = e.target.value;
         if (/^[0-9]$/.test(val)) {
@@ -64,15 +66,14 @@ const VerifyEmailPage = () => {
         setErrorMsg("");
         try {
             const code = otp.join("");
-            const response = await AuthAPI.verifyCode({ email, otp: code });
+            const response = await AuthAPI.verifyOtp({ email, otp: code });
 
             if (response.status === 200) {
                 setSuccessMsg(response.data.message || "Xác thực thành công!");
                 toast.success(response.data.message, { duration: 3000 });
                 setTimeout(() => {
                     setSuccessMsg("");
-                    localStorage.removeItem("emailForVerification");
-                    navigate("/login");
+                    navigate("/change-password", { state: { resetToken: response.data.resetToken } });
                 }, 2500);
             }
         } catch (error) {
@@ -133,8 +134,8 @@ const VerifyEmailPage = () => {
                         )}
                     </AnimatePresence>
                     <div className="flex flex-col items-center mb-6">
-                        <FaEnvelopeOpenText className="text-blue-500 text-5xl mb-2" />
-                        <h2 className="text-2xl font-bold text-center text-blue-800 mb-1">Xác Thực Email</h2>
+                        <FaKey className="text-blue-500 text-5xl mb-2" />
+                        <h2 className="text-2xl font-bold text-center text-blue-800 mb-1">Xác Thực OTP</h2>
                         <p className="text-sm text-center text-gray-600">
                             Nhập mã OTP gồm 6 số đã được gửi đến email của bạn.
                         </p>
@@ -163,8 +164,7 @@ const VerifyEmailPage = () => {
                             type="submit"
                             disabled={loading || otp.some(d => d === "")}
                             className={`w-full py-3 text-white rounded-lg font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2
-                            ${loading || otp.some(d => d === "") ? "bg-blue-300 cursor-not-allowed" : "bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800"}
-                        `}
+                            ${loading || otp.some(d => d === "") ? "bg-blue-300 cursor-not-allowed" : "bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800"}`}
                         >
                             {loading ? "Đang xác thực..." : "Xác Thực"}
                         </button>
@@ -184,4 +184,4 @@ const VerifyEmailPage = () => {
     );
 };
 
-export default VerifyEmailPage;
+export default VerifyPasswordPage;
