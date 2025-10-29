@@ -37,14 +37,22 @@ const LoginPage = () => {
         setSuccessMsg("");
         setErrorMsg("");
         try {
-            const response = await AuthAPI.login({ email, password });
+            const response = await AuthAPI.login({ email, password }); // Gọi API đăng nhập
+            console.log("Phản hồi từ API:", response.data); // Kiểm tra dữ liệu trả về từ backend
+
+            // Lưu dữ liệu vào localStorage
+            localStorage.setItem("userId", response.data.user.userId); // Lưu userId
+            localStorage.setItem("token", response.data.token); // Lưu token để xác thực
+            localStorage.setItem("user", JSON.stringify(response.data.user)); // Lưu thông tin người dùng
+
             setSuccessMsg(response.data.message || "Đăng nhập thành công!");
             toast.success(response.data.message);
             setTimeout(() => {
                 setSuccessMsg("");
-                navigate("/dashboard");
+                navigate("/"); // Điều hướng sau khi đăng nhập thành công
             }, 2000);
         } catch (error) {
+            console.error("Đăng nhập thất bại:", error);
             setErrorMsg("Đăng nhập thất bại!");
             toast.error(error.response?.data?.message || "Đăng nhập thất bại!");
             setTimeout(() => setErrorMsg(""), 3000);
@@ -113,9 +121,9 @@ const LoginPage = () => {
                             placeholder="Nhập email của bạn"
                             className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
         ${focusField === "email"
-                                ? "border-blue-500 ring-2 ring-blue-200"
-                                : "border-gray-300 focus:border-blue-400"
-                            }
+                                    ? "border-blue-500 ring-2 ring-blue-200"
+                                    : "border-gray-300 focus:border-blue-400"
+                                }
         placeholder-gray-400 outline-none`}
                         />
                         <motion.span
