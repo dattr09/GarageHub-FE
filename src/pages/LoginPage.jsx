@@ -37,19 +37,16 @@ const LoginPage = () => {
         setSuccessMsg("");
         setErrorMsg("");
         try {
-            const response = await AuthAPI.login({ email, password }); // Gọi API đăng nhập
-            console.log("Phản hồi từ API:", response.data); // Kiểm tra dữ liệu trả về từ backend
-
-            // Lưu dữ liệu vào localStorage
-            localStorage.setItem("userId", response.data.user.userId); // Lưu userId
-            localStorage.setItem("token", response.data.token); // Lưu token để xác thực
-            localStorage.setItem("user", JSON.stringify(response.data.user)); // Lưu thông tin người dùng
+            const response = await AuthAPI.login({ email, password });
+            localStorage.setItem("userId", response.data.user.userId);
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
 
             setSuccessMsg(response.data.message || "Đăng nhập thành công!");
             toast.success(response.data.message);
             setTimeout(() => {
                 setSuccessMsg("");
-                navigate("/"); // Điều hướng sau khi đăng nhập thành công
+                navigate("/");
             }, 2000);
         } catch (error) {
             console.error("Đăng nhập thất bại:", error);

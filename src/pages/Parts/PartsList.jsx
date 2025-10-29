@@ -4,27 +4,25 @@ import { getAllBrands } from "../../services/BrandApi";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-import { Layers, DollarSign, Tag, Archive, Package, XCircle, Edit } from "lucide-react";
+import { Layers, DollarSign, Tag, Archive, Package, XCircle, Edit, Search, ShoppingCart } from "lucide-react";
 
 const PartsList = () => {
     const [parts, setParts] = useState([]);
+    const [filteredParts, setFilteredParts] = useState([]);
     const [brands, setBrands] = useState({});
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedBrand, setSelectedBrand] = useState("");
+    const [priceRange, setPriceRange] = useState([0, Infinity]);
+    const [sortOrder, setSortOrder] = useState(""); // "asc" hoặc "desc"
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const partsData = await getAllParts();
-                const brandsData = await getAllBrands();
-
-                // Tạo một map từ brandId -> brandName
-                const brandsMap = brandsData.reduce((acc, brand) => {
-                    acc[brand._id] = brand.name;
-                    return acc;
-                }, {});
-
+                console.log("Parts Data:", partsData); // Kiểm tra dữ liệu trả về
                 setParts(partsData);
-                setBrands(brandsMap);
+                setFilteredParts(partsData);
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu:", error);
             }
@@ -32,6 +30,41 @@ const PartsList = () => {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        // Lọc danh sách phụ tùng dựa trên các tiêu chí
+        let filtered = parts;
+
+        // Lọc theo tên
+        if (searchTerm) {
+            filtered = filtered.filter((part) =>
+                part.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Lọc theo hãng
+        if (selectedBrand) {
+            filtered = filtered.filter((part) => String(part.brandId) === selectedBrand);
+        }
+
+        // Lọc theo giá
+        filtered = filtered.filter(
+            (part) => part.price >= priceRange[0] && part.price <= priceRange[1]
+        );
+
+        // Sắp xếp
+        if (sortOrder === "asc") {
+            filtered = filtered.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortOrder === "desc") {
+            filtered = filtered.sort((a, b) => b.name.localeCompare(a.name));
+        } else if (sortOrder === "priceAsc") {
+            filtered = filtered.sort((a, b) => a.price - b.price);
+        } else if (sortOrder === "priceDesc") {
+            filtered = filtered.sort((a, b) => b.price - a.price);
+        }
+
+        setFilteredParts(filtered);
+    }, [searchTerm, selectedBrand, priceRange, sortOrder, parts]);
 
     const handleDelete = async (part) => {
         Swal.fire({
@@ -67,14 +100,48 @@ const PartsList = () => {
         });
     };
 
+    const handleAddToCart = (part) => {
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+        // Sử dụng id, _id hoặc name để kiểm tra sản phẩm
+        const idx = cart.findIndex((item) => item.id === (part.id || part._id || part.name));
+
+        if (idx >= 0) {
+            // Nếu sản phẩm đã tồn tại, tăng số lượng
+            cart[idx].quantity += 1;
+        } else {
+            // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới
+            cart.push({ ...part, id: part.id || part._id || part.name, quantity: 1 });
+        }
+
+        // Lưu giỏ hàng vào localStorage
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        // Gửi sự kiện để cập nhật giỏ hàng (nếu cần)
+        window.dispatchEvent(new Event("cartChanged"));
+
+        // Hiển thị thông báo thành công
+        Swal.fire({
+            icon: "success",
+            title: "Đã thêm vào giỏ hàng!",
+            showConfirmButton: false,
+            timer: 1200,
+            timerProgressBar: true,
+        });
+    };
+
     const formatPrice = (price) => {
         return new Intl.NumberFormat("vi-VN").format(price);
     };
 
+    useEffect(() => {
+
+    }, [parts, brands]);
+
     return (
-        <div className="container mx-auto p-6 bg-gray-50 shadow-lg rounded-lg">
+        <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-md max-w-6xl mx-auto mt-6">
             <div className="text-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800 flex items-center justify-center gap-2">
+                <h1 className="text-3xl font-bold text-blue-800 flex items-center justify-center gap-2">
                     <Package className="w-6 h-6 text-blue-600" /> Danh sách phụ tùng
                 </h1>
             </div>
@@ -88,56 +155,112 @@ const PartsList = () => {
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {parts.map((part) => (
+            {/* Thanh tìm kiếm và bộ lọc */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                {/* Tìm kiếm theo tên */}
+                <div className="relative col-span-3">
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm phụ tùng..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                    <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
+                </div>
+
+                {/* Dropdown sắp xếp */}
+                <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                    <option value="">Sắp xếp</option>
+                    <option value="asc">Tên: A → Z</option>
+                    <option value="desc">Tên: Z → A</option>
+                    <option value="priceAsc">Giá: Thấp → Cao</option>
+                    <option value="priceDesc">Giá: Cao → Thấp</option>
+                </select>
+            </div>
+
+            {/* Grid container */}
+            <div
+                className={`grid gap-4 ${filteredParts.length < 4
+                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-center"
+                    : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                    }`}
+            >
+                {filteredParts.map((part) => (
                     <div
                         key={part._id}
-                        className="bg-white shadow-md rounded-lg p-4 text-center border border-gray-200 hover:shadow-lg transition h-full flex flex-col justify-between cursor-pointer"
-                        onClick={() => navigate(`/parts/${part._id}`)} // Chuyển đến trang chi tiết
+                        className="bg-white shadow-md rounded-lg p-3 border border-gray-200 hover:shadow-lg transition transform hover:-translate-y-1 flex flex-col justify-between"
                     >
-                        <div className="flex justify-center items-center mb-4">
+                        {/* Hình ảnh */}
+                        <div className="flex justify-center items-center mb-3">
                             <img
                                 src={part.image || "https://via.placeholder.com/150"}
                                 alt={part.name}
-                                className="w-45 h-32 object-cover rounded-lg" // Đặt chiều rộng và chiều cao bằng nhau để tạo hình vuông
+                                className="w-36 h-26 object-contain rounded-lg bg-white"
                             />
                         </div>
-                        <div>
-                            <h2 className="text-lg font-semibold text-gray-800 flex items-center justify-center gap-2">
-                                <Tag className="w-4 h-4 text-gray-500" /> {part.name}
+
+                        {/* Thông tin sản phẩm */}
+                        <div className="text-center">
+                            <h2
+                                className="text-lg font-bold text-blue-600 mb-1 cursor-pointer hover:underline"
+                                onClick={() => navigate(`/parts/${part._id}`)}
+                            >
+                                {part.name}
                             </h2>
-                            <p className="text-gray-600 flex items-center justify-center gap-2">
-                                <Layers className="w-4 h-4 text-gray-500" /> Số lượng: {part.quantity}
+                            <p className="text-gray-600 text-sm mb-1">
+                                <Layers className="inline-block w-4 h-4 text-gray-500 mr-1" />
+                                Số lượng: <span className="font-semibold">{part.quantity}</span>
                             </p>
-                            <p className="text-gray-600 flex items-center justify-center gap-2">
-                                <DollarSign className="w-4 h-4 text-gray-500" /> Giá bán: {formatPrice(part.price)} VND
+                            <p className="text-gray-600 text-sm mb-1">
+                                <DollarSign className="inline-block w-4 h-4 text-gray-500 mr-1" />
+                                Giá bán: <span className="font-semibold text-green-600">{formatPrice(part.price)} VND</span>
                             </p>
-                            <p className="text-gray-600 flex items-center justify-center gap-2">
-                                <Archive className="w-4 h-4 text-gray-500" /> Đơn vị: {part.unit}
+                            <p className="text-gray-600 text-sm mb-1">
+                                <Archive className="inline-block w-4 h-4 text-gray-500 mr-1" />
+                                Đơn vị: <span className="font-semibold">{part.unit}</span>
                             </p>
-                            <p className="text-gray-600 flex items-center justify-center gap-2">
-                                <Tag className="w-4 h-4 text-gray-500" /> Thương hiệu: {part.brandId?.name || "Không xác định"}
+                            <p className="text-gray-600 text-sm">
+                                <Tag className="inline-block w-4 h-4 text-gray-500 mr-1" />
+                                Thương hiệu: <span className="font-semibold">{part.brandId?.name || "Không xác định"}</span>
                             </p>
                         </div>
-                        <div className="flex justify-center gap-2 mt-4">
+
+                        {/* Nút hành động */}
+                        <div className="flex flex-col items-center gap-2 mt-3">
                             <button
-                                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg shadow-md flex items-center gap-2"
                                 onClick={(e) => {
-                                    e.stopPropagation(); // Ngăn sự kiện click vào thẻ
-                                    navigate(`/parts/edit/${part._id}`); // Chuyển đến trang sửa
+                                    e.stopPropagation();
+                                    handleAddToCart(part);
                                 }}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg shadow-md flex items-center gap-2 w-full"
                             >
-                                <Edit className="w-4 h-4" /> Sửa
+                                <ShoppingCart size={16} /> Thêm vào giỏ hàng
                             </button>
-                            <button
-                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg shadow-md flex items-center gap-2"
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Ngăn sự kiện click vào thẻ
-                                    handleDelete(part);
-                                }}
-                            >
-                                <XCircle className="w-4 h-4" /> Xóa
-                            </button>
+                            <div className="flex justify-center gap-2 w-full">
+                                <button
+                                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded-lg shadow-md flex items-center gap-2 w-full"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/parts/edit/${part._id}`);
+                                    }}
+                                >
+                                    <Edit className="w-4 h-4" /> Sửa
+                                </button>
+                                <button
+                                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg shadow-md flex items-center gap-2 w-full"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(part);
+                                    }}
+                                >
+                                    <XCircle className="w-4 h-4" /> Xóa
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}

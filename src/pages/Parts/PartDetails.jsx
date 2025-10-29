@@ -32,6 +32,7 @@ const PartDetails = () => {
     return (
         <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-2xl">
+                {/* Header */}
                 <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-100">
                     <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-2">
                         <Package className="text-blue-600 w-6 h-6" />
@@ -39,38 +40,48 @@ const PartDetails = () => {
                     <h3 className="text-2xl font-semibold text-gray-800 text-center">Chi tiết phụ tùng</h3>
                 </div>
 
-                <div className="px-6 py-6 text-center">
+                {/* Nội dung */}
+                <div className="px-6 py-6">
                     {/* Hình ảnh sản phẩm */}
                     <div className="flex justify-center mb-6">
-                        <div className="w-40 h-40 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
+                        <div className="w-48 h-48 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden shadow-md">
                             <img
                                 src={part.image || "https://via.placeholder.com/150"}
                                 alt={part.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain"
                             />
                         </div>
                     </div>
 
                     {/* Thông tin sản phẩm */}
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-semibold text-gray-800 flex items-center justify-center gap-2">
+                    <div className="space-y-4 text-center">
+                        <h2 className="text-xl font-bold text-gray-800 flex items-center justify-center gap-2">
                             <Tag className="w-5 h-5 text-gray-500" /> {part.name}
                         </h2>
-                        <p className="text-gray-600 flex items-center justify-center gap-2">
-                            <Layers className="w-5 h-5 text-gray-500" /> <span className="font-medium">Số lượng:</span> {part.quantity}
+                        <p className="text-gray-600 text-lg flex items-center justify-center gap-2">
+                            <Layers className="w-5 h-5 text-gray-500" />
+                            <span className="font-medium">Số lượng:</span>
+                            <span className="font-semibold">{part.quantity}</span>
                         </p>
-                        <p className="text-gray-600 flex items-center justify-center gap-2">
-                            <DollarSign className="w-5 h-5 text-gray-500" /> <span className="font-medium">Giá bán:</span> {formatPrice(part.price)} VND
+                        <p className="text-gray-600 text-lg flex items-center justify-center gap-2">
+                            <DollarSign className="w-5 h-5 text-gray-500" />
+                            <span className="font-medium">Giá bán:</span>
+                            <span className="font-semibold text-green-600">{formatPrice(part.price)} VND</span>
                         </p>
-                        <p className="text-gray-600 flex items-center justify-center gap-2">
-                            <Archive className="w-5 h-5 text-gray-500" /> <span className="font-medium">Đơn vị:</span> {part.unit}
+                        <p className="text-gray-600 text-lg flex items-center justify-center gap-2">
+                            <Archive className="w-5 h-5 text-gray-500" />
+                            <span className="font-medium">Đơn vị:</span>
+                            <span className="font-semibold">{part.unit}</span>
                         </p>
-                        <p className="text-gray-600 flex items-center justify-center gap-2">
-                            <Tag className="w-5 h-5 text-gray-500" /> <span className="font-medium">Thương hiệu:</span> {part.brandId?.name || "Không xác định"}
+                        <p className="text-gray-600 text-lg flex items-center justify-center gap-2">
+                            <Tag className="w-5 h-5 text-gray-500" />
+                            <span className="font-medium">Thương hiệu:</span>
+                            <span className="font-semibold">{part.brandId?.name || "Không xác định"}</span>
                         </p>
                     </div>
                 </div>
 
+                {/* Footer */}
                 <div className="mt-6 flex items-center justify-center gap-4 px-6 pb-6">
                     <button
                         type="button"

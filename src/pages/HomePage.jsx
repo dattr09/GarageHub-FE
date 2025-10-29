@@ -27,7 +27,7 @@ export default function HomePage() {
         <div className="w-full max-w-9xl mx-auto px-4 flex flex-col gap-8">
             <NavbarCarousel />
             <ServiceCards />
-            <Accessories parts={parts} /> {/* Truyền `parts` vào Accessories */}
+            <Accessories parts={parts} />
             <FeaturedProducts parts={parts} brands={brands} />
         </div>
     );

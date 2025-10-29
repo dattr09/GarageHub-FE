@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createOrder } from "../services/OrderApi";
 import { ShoppingBag, Mail, Phone, MapPin, StickyNote, User } from "lucide-react";
-import { cities } from "../data/cities"; // Import danh sách thành phố
+import { cities } from "../data/cities";
 
 export default function Checkout() {
     const navigate = useNavigate();
@@ -39,14 +39,14 @@ export default function Checkout() {
             setInfo((info) => ({ ...info, name, phone, email }));
 
             const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-            setCart(storedCart); // Đồng bộ giỏ hàng từ localStorage
+            setCart(storedCart);
         }
     }, [navigate]);
 
     useEffect(() => {
         const handleCartChange = () => {
             const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-            setCart(storedCart); // Cập nhật giỏ hàng khi có thay đổi
+            setCart(storedCart);
         };
 
         window.addEventListener("cartChanged", handleCartChange);
@@ -56,12 +56,9 @@ export default function Checkout() {
         };
     }, []);
 
-    // Xử lý thay đổi input form
     const handleChange = (e) => {
         const { name, value } = e.target;
         setInfo({ ...info, [name]: value });
-
-        // Tự động điền state và zipCode khi nhập thành phố
         if (name === "city") {
             const selectedCity = cities.find((city) => city.city.toLowerCase() === value.toLowerCase());
             if (selectedCity) {
@@ -102,14 +99,10 @@ export default function Checkout() {
 
         try {
             const res = await createOrder(order);
-            console.log("Phản hồi từ API:", res);
-
             localStorage.removeItem("cart");
             setCart([]);
             window.dispatchEvent(new Event("cartChanged"));
-
-            // Điều hướng đến trang xác nhận đơn hàng
-            navigate("/order-success", { state: { orderId: res.orderId } });
+            navigate("/ordersuccess", { state: { orderId: res.orderId } });
         } catch (err) {
             console.error("Đặt hàng thất bại:", err.response?.data || err.message);
             alert(`Đặt hàng thất bại: ${err.response?.data?.message || "Lỗi không xác định!"}`);
@@ -126,10 +119,10 @@ export default function Checkout() {
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {[{ icon: <User />, name: "name", placeholder: "Họ tên" },
-                        { icon: <Phone />, name: "phone", placeholder: "Số điện thoại" },
-                        { icon: <MapPin />, name: "address", placeholder: "Địa chỉ giao hàng" },
-                        { icon: <MapPin />, name: "city", placeholder: "Thành phố" },
-                        { icon: <Mail />, name: "email", placeholder: "Email liên hệ", type: "email" },
+                    { icon: <Phone />, name: "phone", placeholder: "Số điện thoại" },
+                    { icon: <MapPin />, name: "address", placeholder: "Địa chỉ giao hàng" },
+                    { icon: <MapPin />, name: "city", placeholder: "Thành phố" },
+                    { icon: <Mail />, name: "email", placeholder: "Email liên hệ", type: "email" },
                     ].map(({ icon, name, placeholder, type }) => (
                         <div key={name} className="relative">
                             <div className="absolute left-3 top-3 text-blue-600">{icon}</div>

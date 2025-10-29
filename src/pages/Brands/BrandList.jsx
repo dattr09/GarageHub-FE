@@ -1,37 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { getAllBrands, deleteBrand } from "../../services/BrandApi";
 import { useNavigate } from "react-router-dom";
-import { FaEdit, FaTrash, FaPlus, FaCar } from "react-icons/fa";
 import Swal from "sweetalert2";
-import "sweetalert2/dist/sweetalert2.min.css";
+import { Eye, Edit, Trash2, PlusCircle, ClipboardList, Search } from "lucide-react";
 
 const BrandList = () => {
     const [brands, setBrands] = useState([]);
+    const [filteredBrands, setFilteredBrands] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchBrands = async () => {
-            try {
-                const data = await getAllBrands();
-                setBrands(data);
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách thương hiệu:", error);
-            }
-        };
-
         fetchBrands();
     }, []);
+
+    useEffect(() => {
+        const filtered = brands.filter((brand) =>
+            brand.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredBrands(filtered);
+    }, [searchTerm, brands]);
+
+    const fetchBrands = async () => {
+        setLoading(true);
+        try {
+            const data = await getAllBrands();
+            setBrands(data);
+            setFilteredBrands(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách thương hiệu:", error);
+            Swal.fire({
+                title: "Lỗi!",
+                text: "Không thể tải danh sách thương hiệu.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleDelete = async (brand) => {
         Swal.fire({
             title: `Xóa thương hiệu: ${brand.name}`,
-            html: `
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img src="${brand.image || "https://via.placeholder.com/300"}" alt="${brand.name}" 
-                    style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;" />
-                <p>Bạn có chắc chắn muốn xóa thương hiệu này?</p>
-            </div>
-        `,
+            text: "Bạn có chắc chắn muốn xóa thương hiệu này?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",
@@ -41,102 +54,113 @@ const BrandList = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await deleteBrand(brand._id, localStorage.getItem("token"));
+                    await deleteBrand(brand._id);
                     setBrands(brands.filter((b) => b._id !== brand._id));
-
-                    Swal.fire({
-                        title: "Đã xóa!",
-                        text: `Thương hiệu "${brand.name}" đã được xóa thành công.`,
-                        icon: "success",
-                        confirmButtonColor: "#3085d6",
-                    });
+                    Swal.fire("Đã xóa!", `Thương hiệu "${brand.name}" đã được xóa.`, "success");
                 } catch (error) {
                     console.error("Lỗi khi xóa thương hiệu:", error);
-
-                    Swal.fire({
-                        title: "Lỗi!",
-                        text: "Xóa thương hiệu thất bại. Vui lòng thử lại.",
-                        icon: "error",
-                        confirmButtonColor: "#3085d6",
-                    });
+                    Swal.fire("Lỗi!", "Xóa thương hiệu thất bại. Vui lòng thử lại.", "error");
                 }
             }
         });
     };
 
     return (
-        <div className="container mx-auto p-6 bg-gray-50 shadow-lg rounded-lg">
-            {/* Title Section */}
-            <div className="text-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800 flex items-center justify-center gap-2">
-                    <FaCar className="text-blue-500" /> Danh sách thương hiệu
-                </h1>
+        <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-md max-w-6xl mx-auto mt-6">
+            {/* Tiêu đề */}
+            <div className="flex flex-col items-center mb-6">
+                <div className="flex items-center gap-2 text-blue-600">
+                    <ClipboardList className="w-8 h-8" />
+                    <h2 className="text-3xl font-bold text-blue-800">Danh sách thương hiệu</h2>
+                </div>
+                <p className="text-gray-500 text-sm mt-2">
+                    Tổng số thương hiệu: <span className="font-semibold">{filteredBrands.length}</span>
+                </p>
             </div>
 
-            {/* Add Button */}
-            <div className="flex justify-end mb-6">
+            {/* Thanh tìm kiếm và nút thêm thương hiệu */}
+            <div className="flex justify-end items-center mb-4">
                 <button
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow-md"
+                    className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition"
                     onClick={() => navigate("/brands/add")}
                 >
-                    <FaPlus /> Thêm mới
+                    <PlusCircle className="w-5 h-5" />
+                    Thêm thương hiệu
                 </button>
             </div>
 
-            {/* Total Brands */}
-            <div className="mb-4 text-gray-600 text-lg text-center">
-                Tổng số thương hiệu:{" "}
-                <span className="font-bold text-gray-800">{brands.length}</span>
+            {/* Thanh tìm kiếm */}
+            <div className="relative w-full mb-6">
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm thương hiệu..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <Search className="absolute left-3 top-2.5 w-5 h-5 text-blue-400" />
             </div>
 
-            {/* Brand Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
-                {brands.map((brand) => (
-                    <div
-                        key={brand._id}
-                        className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center text-center border border-gray-200 hover:shadow-xl transition w-full max-w-xs cursor-pointer"
-                        onClick={() => navigate(`/brands/${brand._id}`)} // Điều hướng đến trang chi tiết
-                    >
-                        {/* Brand Image */}
-                        <img
-                            src={brand.image || "https://via.placeholder.com/150"}
-                            alt={brand.name}
-                            className="w-45 h-32 object-cover rounded-lg mb-4 border border-gray-300" // Đặt chiều rộng và chiều cao bằng nhau
-                        />
-                        {/* Brand Name */}
-                        <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                            {brand.name}
-                        </h2>
-                        {/* Action Buttons */}
-                        <div className="flex gap-4 mt-4">
-                            <button
-                                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md"
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Ngăn điều hướng khi bấm nút
-                                    navigate(`/brands/edit/${brand._id}`);
-                                }}
-                            >
-                                <FaEdit /> Sửa
-                            </button>
-                            <button
-                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md"
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Ngăn điều hướng khi bấm nút
-                                    handleDelete(brand);
-                                }}
-                            >
-                                <FaTrash /> Xóa
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* No Brands Message */}
-            {brands.length === 0 && (
-                <div className="text-center text-gray-500 mt-10">
-                    Không có thương hiệu nào. Nhấn "Thêm mới" để tạo mới.
+            {/* Bảng danh sách */}
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="text-gray-500 text-lg">Đang tải dữ liệu...</div>
                 </div>
+            ) : (
+                <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow">
+                    <thead>
+                        <tr className="bg-gray-200 text-gray-700 text-center">
+                            <th className="px-4 py-3">Tên thương hiệu</th>
+                            <th className="px-4 py-3">Hình ảnh</th>
+                            <th className="px-4 py-3">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredBrands.length > 0 ? (
+                            filteredBrands.map((brand) => (
+                                <tr
+                                    key={brand._id}
+                                    className="hover:bg-gray-100 transition border-b last:border-none text-center"
+                                >
+                                    <td className="px-4 py-3">{brand.name}</td>
+                                    <td className="px-4 py-3">
+                                        <img
+                                            src={brand.image || "https://via.placeholder.com/150"}
+                                            alt={brand.name}
+                                            className="w-12 h-12 object-cover rounded-lg border mx-auto"
+                                        />
+                                    </td>
+                                    <td className="px-4 py-6 flex items-center justify-center gap-4">
+                                        <button
+                                            className="text-blue-500 hover:text-blue-700"
+                                            onClick={() => navigate(`/brands/${brand._id}`)}
+                                        >
+                                            <Eye className="w-5 h-5" />
+                                        </button>
+                                        <button
+                                            className="text-yellow-500 hover:text-yellow-700"
+                                            onClick={() => navigate(`/brands/edit/${brand._id}`)}
+                                        >
+                                            <Edit className="w-5 h-5" />
+                                        </button>
+                                        <button
+                                            className="text-red-500 hover:text-red-700"
+                                            onClick={() => handleDelete(brand)}
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={3} className="text-center py-6 text-gray-500">
+                                    Không tìm thấy thương hiệu nào
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             )}
         </div>
     );

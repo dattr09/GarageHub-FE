@@ -8,7 +8,7 @@ export default function Cart() {
 
     useEffect(() => {
         const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-        setCart(storedCart); // Đồng bộ giỏ hàng từ localStorage
+        setCart(storedCart);
     }, []);
 
     const removeItem = (id) => {
@@ -30,7 +30,6 @@ export default function Cart() {
             const existingItem = prevCart.find((item) => item.id === product.id);
 
             if (existingItem) {
-                // Nếu sản phẩm đã tồn tại, tăng số lượng
                 const updatedCart = prevCart.map((item) =>
                     item.id === product.id
                         ? { ...item, quantity: item.quantity + product.quantity }
@@ -39,7 +38,6 @@ export default function Cart() {
                 localStorage.setItem("cart", JSON.stringify(updatedCart));
                 return updatedCart;
             } else {
-                // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới
                 const updatedCart = [...prevCart, product];
                 localStorage.setItem("cart", JSON.stringify(updatedCart));
                 return updatedCart;
@@ -132,7 +130,7 @@ export default function Cart() {
                         </button>
                         <button
                             onClick={() => {
-                                navigate("/checkout"); // Điều hướng sang trang Checkout mà không xóa giỏ hàng
+                                navigate("/checkout");
                             }}
                             className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-800 text-white px-6 py-2 rounded-xl font-semibold shadow-lg transition duration-300 transform hover:scale-105"
                         >

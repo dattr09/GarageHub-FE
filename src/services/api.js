@@ -27,6 +27,20 @@ export const AuthAPI = {
   forgotPassword: (data) => api.post("/auth/forgot-password", data),
   verifyOtp: (data) => api.post("/auth/verify-otp", data),
   resetPassword: (data, config) => api.post("/auth/reset-password", data, config),
+  getAllUsers: async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await api.get("/auth/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+    }
+  },
 };
 
 export default api;
