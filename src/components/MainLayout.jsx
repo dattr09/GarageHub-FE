@@ -7,10 +7,12 @@ import BrandList from "../pages/Brands/BrandList";
 import AddBrandForm from "../pages/Brands/AddBrandForm";
 import EditBrandForm from "../pages/Brands/EditBrandForm";
 import BrandDetails from "../pages/Brands/BrandDetails";
+import DeleteList from "../pages/Brands/DeleteList";
 import PartsList from "../pages/Parts/PartsList";
 import AddPartForm from "../pages/Parts/AddPartForm";
 import EditPartForm from "../pages/Parts/EditPartForm";
 import PartDetails from "../pages/Parts/PartDetails";
+import DeletePartList from "../pages/Parts/DeletePartList";
 import Cart from "../pages/Cart";
 import Checkout from "../pages/Checkout";
 import OrderSuccess from "../pages/OrderSuccess";
@@ -29,57 +31,59 @@ const HEADER_HEIGHT = 64;
 
 // Layout chính cho toàn bộ trang, chứa Header, Footer và định tuyến các trang con
 const MainLayout = () => {
-    return (
-        <div className="main-layout bg-gradient-to-tr from-blue-200 via-white to-blue-100 flex flex-col min-h-screen">
-            <div
-                className="fixed top-0 left-0 w-full z-50 bg-white/80 shadow"
-                style={{ height: HEADER_HEIGHT }}
-            >
-                <Header />
-            </div>
-            <main className="flex-1 p-4" style={{ paddingTop: HEADER_HEIGHT }}>
-                <Routes>
-                    {/* Route chính */}
-                    <Route path="/" element={<HomePage />} />
+  return (
+    <div className="main-layout bg-gradient-to-tr from-blue-200 via-white to-blue-100 flex flex-col min-h-screen">
+      <div
+        className="fixed top-0 left-0 w-full z-50 bg-white/80 shadow"
+        style={{ height: HEADER_HEIGHT }}
+      >
+        <Header />
+      </div>
+      <main className="flex-1 p-4" style={{ paddingTop: HEADER_HEIGHT }}>
+        <Routes>
+          {/* Route chính */}
+          <Route path="/" element={<HomePage />} />
 
-                    {/* Các route cho Brands */}
-                    <Route path="/brands" element={<BrandList />} />
-                    <Route path="/brands/add" element={<AddBrandForm />} />
-                    <Route path="/brands/edit/:id" element={<EditBrandForm />} />
-                    <Route path="/brands/:id" element={<BrandDetails />} />
+          {/* Các route cho Brands */}
+          <Route path="/brands" element={<BrandList />} />
+          <Route path="/brands/add" element={<AddBrandForm />} />
+          <Route path="/brands/edit/:id" element={<EditBrandForm />} />
+          <Route path="/brands/:id" element={<BrandDetails />} />
+          <Route path="/brands/deleted/list" element={<DeleteList />} />
 
-                    {/* Các route cho Parts */}
-                    <Route path="/parts" element={<PartsList />} />
-                    <Route path="/parts/add" element={<AddPartForm />} />
-                    <Route path="/parts/edit/:id" element={<EditPartForm />} />
-                    <Route path="/parts/:id" element={<PartDetails />} />
+          {/* Các route cho Parts */}
+          <Route path="/parts" element={<PartsList />} />
+          <Route path="/parts/add" element={<AddPartForm />} />
+          <Route path="/parts/edit/:id" element={<EditPartForm />} />
+          <Route path="/parts/:id" element={<PartDetails />} />
+          <Route path="/parts/deleted/list" element={<DeletePartList />} />
 
-                    {/* Các route giỏ hàng và thanh toán */}
-                    <Route path="/cart" element={<Cart />} />
-                    <Route path="/checkout" element={<Checkout />} />
-                    <Route path="/ordersuccess" element={<OrderSuccess />} />
-                    <Route path="/order-history" element={<OrderHistory />} />
+          {/* Các route giỏ hàng và thanh toán */}
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/ordersuccess" element={<OrderSuccess />} />
+          <Route path="/order-history" element={<OrderHistory />} />
 
-                    {/* Các route cho Motos */}
-                    <Route path="/motos" element={<MotoList />} />
-                    <Route path="/motos/add" element={<AddMotoForm />} />
-                    <Route path="/motos/edit/:licensePlate" element={<EditMotoForm />} />
-                    <Route path="/motos/:licensePlate" element={<MotoDetails />} />
+          {/* Các route cho Motos */}
+          <Route path="/motos" element={<MotoList />} />
+          <Route path="/motos/add" element={<AddMotoForm />} />
+          <Route path="/motos/edit/:licensePlate" element={<EditMotoForm />} />
+          <Route path="/motos/:licensePlate" element={<MotoDetails />} />
 
-                    {/* Các route cho RepairOrders */}
-                    <Route path="/repair-orders" element={<RepairOrderList />} />
-                    <Route path="/repair-orders/add" element={<RepairOrderAdd />} />
-                    <Route path="/repair-orders/edit/:id" element={<RepairOrderEdit />} />
-                    <Route path="/repair-orders/:id" element={<RepairOrderDetails />} />
+          {/* Các route cho RepairOrders */}
+          <Route path="/repair-orders" element={<RepairOrderList />} />
+          <Route path="/repair-orders/add" element={<RepairOrderAdd />} />
+          <Route path="/repair-orders/edit/:id" element={<RepairOrderEdit />} />
+          <Route path="/repair-orders/:id" element={<RepairOrderDetails />} />
 
-                    {/* Các route cho thống kê */}
-                    <Route path="/statistics" element={<Statistics />} />
-                </Routes>
-                <Outlet />
-            </main>
-            <Footer />
-        </div>
-    );
+          {/* Các route cho thống kê */}
+          <Route path="/statistics" element={<Statistics />} />
+        </Routes>
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
 };
 
 export default MainLayout;
