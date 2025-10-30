@@ -25,7 +25,7 @@ export const AuthAPI = {
   verifyCode: (data) => api.post("/auth/verify", data),
   forgotPassword: (data) => api.post("/auth/forgot-password", data),
   verifyOtp: (data) => api.post("/auth/verify-otp", data),
-  resetPassword: (data) => api.post("/auth/reset-password", data),
+  resetPassword: (data, config) => api.post("/auth/reset-password", data, config),
 
   // ✅ Lấy tất cả user (token nằm trong cookies nên không cần header)
   getAllUsers: async () => {
