@@ -3,18 +3,17 @@ import axios from "axios";
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
   withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 });
 
+// ✅ Tự động xử lý lỗi 401
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login"; // Điều hướng về trang đăng nhập
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

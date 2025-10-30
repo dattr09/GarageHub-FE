@@ -1,54 +1,32 @@
-import api from "./api";
+// src/api/MotoApi.js
+import api from "./api"; // dùng lại instance chung
 
-// Lấy xe theo biển số
-export const getMotoByLicensePlate = async (licensePlate) => {
-    try {
-        const response = await api.get(`/motos/${licensePlate}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching moto by license plate:", error);
-        throw error;
-    }
-};
-
-// Cập nhật xe theo biển số
-export const updateMoto = async (licensePlate, motoData) => {
-    try {
-        const response = await api.put(`/motos/${licensePlate}`, motoData);
-        return response.data;
-    } catch (error) {
-        console.error("Error updating moto:", error);
-        throw error;
-    }
-};
-
-// Các API khác giữ nguyên như bạn đã viết
+// ✅ Lấy tất cả xe
 export const getAllMotos = async () => {
-    try {
-        const response = await api.get("/motos");
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching motos:", error);
-        throw error;
-    }
+  const res = await api.get("/motos");
+  return res.data;
 };
 
-export const createMoto = async (motoData) => {
-    try {
-        const response = await api.post("/motos", motoData);
-        return response.data;
-    } catch (error) {
-        console.error("Error creating moto:", error.response?.data || error.message);
-        throw error;
-    }
+// ✅ Lấy xe theo biển số
+export const getMotoByLicensePlate = async (licensePlate) => {
+  const res = await api.get(`/motos/${licensePlate}`);
+  return res.data;
 };
 
+// ✅ Tạo xe mới
+export const createMoto = async (data) => {
+  const res = await api.post("/motos", data);
+  return res.data;
+};
+
+// ✅ Cập nhật xe
+export const updateMoto = async (licensePlate, data) => {
+  const res = await api.put(`/motos/${licensePlate}`, data);
+  return res.data;
+};
+
+// ✅ Xóa xe
 export const deleteMoto = async (licensePlate) => {
-    try {
-        const response = await api.delete(`/motos/${licensePlate}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error deleting moto:", error);
-        throw error;
-    }
+  const res = await api.delete(`/motos/${licensePlate}`);
+  return res.data;
 };

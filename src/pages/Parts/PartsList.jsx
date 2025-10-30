@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getAllParts, deletePart } from "../../services/PartsApi";
 import { getAllBrands } from "../../services/BrandApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { Layers, DollarSign, Tag, Archive, Package, XCircle, Edit, Search, ShoppingCart } from "lucide-react";
@@ -15,12 +15,12 @@ const PartsList = () => {
     const [priceRange, setPriceRange] = useState([0, Infinity]);
     const [sortOrder, setSortOrder] = useState(""); // "asc" hoặc "desc"
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const partsData = await getAllParts();
-                console.log("Parts Data:", partsData); // Kiểm tra dữ liệu trả về
                 setParts(partsData);
                 setFilteredParts(partsData);
             } catch (error) {
@@ -29,6 +29,19 @@ const PartsList = () => {
         };
 
         fetchData();
+    }, []);
+
+    // Lấy danh sách hãng khi load trang
+    useEffect(() => {
+        const fetchBrands = async () => {
+            try {
+                const brandsData = await getAllBrands();
+                setBrands(brandsData.reduce((obj, b) => ({ ...obj, [b._id]: b }), {}));
+            } catch (error) {
+                setBrands({});
+            }
+        };
+        fetchBrands();
     }, []);
 
     useEffect(() => {
@@ -44,7 +57,12 @@ const PartsList = () => {
 
         // Lọc theo hãng
         if (selectedBrand) {
-            filtered = filtered.filter((part) => String(part.brandId) === selectedBrand);
+            filtered = filtered.filter(
+                (part) =>
+                    (typeof part.brandId === "object"
+                        ? part.brandId._id
+                        : part.brandId) === selectedBrand
+            );
         }
 
         // Lọc theo giá
@@ -101,26 +119,28 @@ const PartsList = () => {
     };
 
     const handleAddToCart = (part) => {
-        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+        if (!part.quantity || part.quantity <= 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Hết hàng!",
+                text: "Phụ tùng này đã hết hàng, không thể thêm vào giỏ.",
+                confirmButtonColor: "#3085d6",
+            });
+            return;
+        }
 
-        // Sử dụng id, _id hoặc name để kiểm tra sản phẩm
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
         const idx = cart.findIndex((item) => item.id === (part.id || part._id || part.name));
 
         if (idx >= 0) {
-            // Nếu sản phẩm đã tồn tại, tăng số lượng
             cart[idx].quantity += 1;
         } else {
-            // Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới
             cart.push({ ...part, id: part.id || part._id || part.name, quantity: 1 });
         }
 
-        // Lưu giỏ hàng vào localStorage
         localStorage.setItem("cart", JSON.stringify(cart));
-
-        // Gửi sự kiện để cập nhật giỏ hàng (nếu cần)
         window.dispatchEvent(new Event("cartChanged"));
 
-        // Hiển thị thông báo thành công
         Swal.fire({
             icon: "success",
             title: "Đã thêm vào giỏ hàng!",
@@ -135,8 +155,11 @@ const PartsList = () => {
     };
 
     useEffect(() => {
-
-    }, [parts, brands]);
+        // Lấy brand từ query string nếu có
+        const params = new URLSearchParams(location.search);
+        const brandFromUrl = params.get("brand");
+        if (brandFromUrl) setSelectedBrand(brandFromUrl);
+    }, [location.search]);
 
     return (
         <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-md max-w-6xl mx-auto mt-6">
@@ -156,9 +179,9 @@ const PartsList = () => {
             </div>
 
             {/* Thanh tìm kiếm và bộ lọc */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 {/* Tìm kiếm theo tên */}
-                <div className="relative col-span-3">
+                <div className="relative col-span-2">
                     <input
                         type="text"
                         placeholder="Tìm kiếm phụ tùng..."
@@ -168,7 +191,17 @@ const PartsList = () => {
                     />
                     <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
                 </div>
-
+                {/* Dropdown lọc theo hãng */}
+                <select
+                    value={selectedBrand}
+                    onChange={e => setSelectedBrand(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                    <option value="">Tất cả hãng</option>
+                    {Object.values(brands).map(brand => (
+                        <option key={brand._id} value={brand._id}>{brand.name}</option>
+                    ))}
+                </select>
                 {/* Dropdown sắp xếp */}
                 <select
                     value={sortOrder}

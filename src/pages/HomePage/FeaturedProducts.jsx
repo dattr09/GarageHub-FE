@@ -163,7 +163,7 @@ export default function FeaturedProducts() {
                         <div
                             key={brand.id || brand.name}
                             className="flex flex-col items-center bg-white rounded-2xl shadow-md hover:shadow-xl p-4 transition-all duration-300 transform hover:-translate-y-1 hover:ring-2 hover:ring-blue-300 relative cursor-pointer"
-                            onClick={() => navigate(`/parts?brand=${encodeURIComponent(brand.name)}`)}
+                            onClick={() => navigate(`/parts?brand=${brand._id}`)}
                             title={`Xem phụ tùng hãng ${brand.name}`}
                         >
                             <BadgeCheck className="absolute top-2 right-2 w-6 h-6 text-green-500 bg-white rounded-full shadow" />
