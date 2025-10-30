@@ -23,11 +23,26 @@ import RepairOrderList from "../pages/RepairOrders/RepairOrderList";
 import RepairOrderAdd from "../pages/RepairOrders/RepairOrderAdd";
 import RepairOrderEdit from "../pages/RepairOrders/RepairOrderEdit";
 import RepairOrderDetails from "../pages/RepairOrders/RepairOrderDetails";
+import ChatManagement from "../pages/Admin/ChatManagement";
 
 const HEADER_HEIGHT = 64;
 
 // Layout chính cho toàn bộ trang, chứa Header, Footer và định tuyến các trang con
 const MainLayout = () => {
+    // Lấy thông tin user từ localStorage
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const userId = localStorage.getItem('userId');
+    
+    // Lấy token từ cookie
+    const getCookie = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    };
+    const token = getCookie('jwt-token');
+
     return (
         <div className="main-layout bg-gradient-to-tr from-blue-200 via-white to-blue-100 flex flex-col min-h-screen">
             <div
@@ -70,6 +85,12 @@ const MainLayout = () => {
                     <Route path="/repair-orders/add" element={<RepairOrderAdd />} />
                     <Route path="/repair-orders/edit/:id" element={<RepairOrderEdit />} />
                     <Route path="/repair-orders/:id" element={<RepairOrderDetails />} />
+
+                    {/* Route cho Admin Chat Management */}
+                    <Route 
+                        path="/admin/chat" 
+                        element={<ChatManagement adminId={userId || user?.userId} adminToken={token} />} 
+                    />
                 </Routes>
                 <Outlet />
             </main>

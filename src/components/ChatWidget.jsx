@@ -1,20 +1,55 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./ChatWidget.css";
 
 const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const ChatWidget = ({ userId, userToken }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
   const conversationId = userId; // User's conversation ID
+
+  // Kiểm tra xem user có phải admin không
+  useEffect(() => {
+    try {
+      const userStr = localStorage.getItem("user");
+      console.log("🔍 ChatWidget - userStr from localStorage:", userStr);
+      
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        console.log("🔍 ChatWidget - parsed user object:", user);
+        console.log("🔍 ChatWidget - user.roles:", user.roles);
+        console.log("🔍 ChatWidget - user.role:", user.role);
+        
+        // Kiểm tra roles array hoặc role string
+        const isAdminUser = 
+          (Array.isArray(user.roles) && user.roles.includes("admin")) ||
+          (Array.isArray(user.roles) && user.roles.includes("ADMIN")) ||
+          user.role === "admin" || 
+          user.role === "ADMIN" ||
+          user.isAdmin === true;
+        
+        if (isAdminUser) {
+          console.log("✅ User is admin - setting isAdmin to true");
+          setIsAdmin(true);
+        } else {
+          console.log("❌ User is NOT admin");
+        }
+      }
+    } catch (error) {
+      console.error("Error checking user role:", error);
+    }
+  }, []);
 
   // Scroll to bottom
   const scrollToBottom = () => {
@@ -27,7 +62,8 @@ const ChatWidget = ({ userId, userToken }) => {
 
   // Initialize socket connection
   useEffect(() => {
-    if (!userId) return;
+    // Không khởi tạo socket nếu là admin (vì admin sẽ dùng trang riêng)
+    if (!userId || isAdmin) return;
 
     const newSocket = io(`${SOCKET_URL}/chat`, {
       query: { userId, isAdmin: "false" },
@@ -64,7 +100,7 @@ const ChatWidget = ({ userId, userToken }) => {
     return () => {
       newSocket.close();
     };
-  }, [userId]);
+  }, [userId, isAdmin]);
 
   // Load chat history
   const loadChatHistory = async () => {
@@ -121,8 +157,20 @@ const ChatWidget = ({ userId, userToken }) => {
     }, 1000);
   };
 
-  // Open chat widget
+  // Open chat widget or navigate to admin chat
   const handleOpen = () => {
+    console.log("🔍 ChatWidget - handleOpen called");
+    console.log("🔍 ChatWidget - isAdmin:", isAdmin);
+    
+    // Nếu là admin, chuyển hướng đến trang quản lý chat
+    if (isAdmin) {
+      console.log("✅ Navigating to /admin/chat");
+      navigate("/admin/chat");
+      return;
+    }
+
+    console.log("📱 Opening chat widget for regular user");
+    // Nếu là user thường, mở widget chat
     setIsOpen(true);
     setUnreadCount(0);
     

@@ -14,6 +14,11 @@ const ChatManagement = ({ adminId, adminToken }) => {
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
+  // Debug log
+  console.log("🔍 ChatManagement loaded");
+  console.log("adminId:", adminId);
+  console.log("adminToken:", adminToken);
+
   // Scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,9 +76,7 @@ const ChatManagement = ({ adminId, adminToken }) => {
   const loadConversations = async () => {
     try {
       const response = await fetch(`${SOCKET_URL}/api/v1/chat/conversations`, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
+        credentials: 'include', // Tự động gửi cookie
       });
       const data = await response.json();
       if (data.success) {
@@ -88,9 +91,7 @@ const ChatManagement = ({ adminId, adminToken }) => {
   const loadMessages = async (conversationId) => {
     try {
       const response = await fetch(`${SOCKET_URL}/api/v1/chat/messages/${conversationId}`, {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
+        credentials: 'include', // Tự động gửi cookie
       });
       const data = await response.json();
       if (data.success) {
