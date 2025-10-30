@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_BACKEND_URL}/api/v1`,
+  baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -21,26 +21,14 @@ api.interceptors.response.use(
 );
 
 export const AuthAPI = {
-  login: (data) => api.post("/auth/login", data),
-  register: (data) => api.post("/auth/register", data),
-  verifyCode: (data) => api.post("/auth/verify", data),
-  forgotPassword: (data) => api.post("/auth/forgot-password", data),
-  verifyOtp: (data) => api.post("/auth/verify-otp", data),
-  resetPassword: (data, config) => api.post("/auth/reset-password", data, config),
-  getAllUsers: async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await api.get("/auth/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      throw error;
-    }
-  },
+  login: (data) => api.post("/users/login", data),
+  register: (data) => api.post("/users/register", data),
+  verifyCode: (data) => api.post("/users/verify", data),
+  forgotPassword: (data) => api.post("/users/forgot-password", data),
+  verifyOtp: (data) => api.post("/users/verify-otp", data),
+  resetPassword: (data, config) =>
+    api.post("/users/reset-password", data, config),
+  getUserInfo: () => api.get("/users/me"),
 };
 
 export default api;
