@@ -3,7 +3,12 @@ import { Undo2, Trash2, Wrench } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { useNavigate } from "react-router-dom";
-import { RepairOrderApi } from "../../services/repairOrderApi";
+import {
+  RepairOrderApi,
+  getDeletedRepairOrders,
+  deleteRepairOrderPermanently,
+  restoreRepairOrder,
+} from "../../services/repairOrderApi";
 
 const fadeInStyle = `
 @keyframes fadeIn {
@@ -20,77 +25,71 @@ const DeleteRepairOrderList = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // ✅ Lấy danh sách phiếu sửa chữa đã xóa mềm
+  const fetchDeletedOrders = async () => {
+    setLoading(true);
+    try {
+      const data = await getDeletedRepairOrders();
+      // data có thể là { message, deletedRepairOrders }
+      setDeletedOrders(data?.deletedRepairOrders || []);
+    } catch (error) {
+      Swal.fire("Lỗi!", "Không thể tải danh sách phiếu đã xóa.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDeletedOrders = async () => {
-      try {
-        const res = await RepairOrderApi.getAll(); // Hoặc endpoint riêng cho deleted orders nếu có
-        // Nếu API có field isDeleted hoặc deletedAt → lọc ở FE
-        const deleted = Array.isArray(res)
-          ? res.filter((o) => o.isDeleted || o.deletedAt)
-          : res.data.filter((o) => o.isDeleted || o.deletedAt);
-        setDeletedOrders(deleted);
-      } catch (error) {
-        Swal.fire("Lỗi!", "Không thể tải danh sách phiếu đã xóa.", "error");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchDeletedOrders();
   }, []);
 
-  // ✅ Khôi phục phiếu sửa chữa
+  // Khôi phục phiếu
+  // Khôi phục phiếu
   const handleRestore = async (id) => {
-    Swal.fire({
+    const confirm = await Swal.fire({
       title: "Khôi phục phiếu?",
       text: "Bạn có chắc muốn khôi phục phiếu sửa chữa này?",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Khôi phục",
       cancelButtonText: "Hủy",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await RepairOrderApi.update(id, { isDeleted: false });
-          setDeletedOrders(deletedOrders.filter((o) => o._id !== id));
-          Swal.fire("Thành công!", "Phiếu đã được khôi phục.", "success");
-        } catch {
-          Swal.fire("Lỗi!", "Không thể khôi phục phiếu.", "error");
-        }
-      }
     });
+
+    if (confirm.isConfirmed) {
+      try {
+        await restoreRepairOrder(id); // <-- gọi hàm restore mới
+        await fetchDeletedOrders(); // refresh danh sách
+        Swal.fire("Thành công!", "Phiếu đã được khôi phục.", "success");
+      } catch {
+        Swal.fire("Lỗi!", "Không thể khôi phục phiếu.", "error");
+      }
+    }
   };
 
-  // ✅ Xóa vĩnh viễn phiếu sửa chữa
+  // Xóa vĩnh viễn phiếu
   const handlePermanentDelete = async (id) => {
-    Swal.fire({
+    const confirm = await Swal.fire({
       title: "Xóa vĩnh viễn?",
       text: "Thao tác này không thể hoàn tác!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Xóa luôn",
       cancelButtonText: "Hủy",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await RepairOrderApi.remove(id);
-          setDeletedOrders(deletedOrders.filter((o) => o._id !== id));
-          Swal.fire(
-            "Đã xóa!",
-            "Phiếu sửa chữa đã bị xóa vĩnh viễn.",
-            "success"
-          );
-        } catch {
-          Swal.fire("Lỗi!", "Không thể xóa phiếu.", "error");
-        }
-      }
     });
+
+    if (confirm.isConfirmed) {
+      try {
+        await deleteRepairOrderPermanently(id);
+        setDeletedOrders((prev) => prev.filter((o) => o._id !== id));
+        Swal.fire("Đã xóa!", "Phiếu sửa chữa đã bị xóa vĩnh viễn.", "success");
+      } catch {
+        Swal.fire("Lỗi!", "Không thể xóa phiếu.", "error");
+      }
+    }
   };
 
   return (
     <>
       <style>{fadeInStyle}</style>
-
       <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-6xl animate-fade-in">
           {/* Header */}
@@ -128,20 +127,21 @@ const DeleteRepairOrderList = () => {
                   {deletedOrders.map((order) => (
                     <tr key={order._id} className="hover:bg-gray-50 transition">
                       <td className="px-4 py-2 border font-medium">
-                        {order._id}
+                        {order.orderId}
                       </td>
                       <td className="px-4 py-2 border text-gray-700">
-                        {order.customer?.fullName || "N/A"}
+                        {order.customerId?.fullName || "N/A"}
                       </td>
                       <td className="px-4 py-2 border text-gray-700">
-                        {order.employee?.fullName || "N/A"}
+                        {order.employeeId?.fullName || "N/A"}
                       </td>
                       <td className="px-4 py-2 border text-gray-600">
-                        {order.licensePlate || "--"}
+                        {order.items?.map((i) => i.licensePlate).join(", ") ||
+                          "--"}
                       </td>
                       <td className="px-4 py-2 border text-center text-green-600 font-semibold">
-                        {order.totalPrice
-                          ? order.totalPrice.toLocaleString("vi-VN") + " ₫"
+                        {order.totalAmount
+                          ? order.totalAmount.toLocaleString("vi-VN") + " ₫"
                           : "--"}
                       </td>
                       <td className="px-4 py-2 border text-gray-600">
