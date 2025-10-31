@@ -21,10 +21,12 @@ import MotoList from "../pages/Motos/MotoList";
 import AddMotoForm from "../pages/Motos/AddMotoForm";
 import EditMotoForm from "../pages/Motos/EditMotoForm";
 import MotoDetails from "../pages/Motos/MotoDetails";
+import DeleteMotoList from "../pages/Motos/DeleteMotoList";
 import RepairOrderList from "../pages/RepairOrders/RepairOrderList";
 import RepairOrderAdd from "../pages/RepairOrders/RepairOrderAdd";
 import RepairOrderEdit from "../pages/RepairOrders/RepairOrderEdit";
 import RepairOrderDetails from "../pages/RepairOrders/RepairOrderDetails";
+import DeleteRepairOrderList from "../pages/RepairOrders/DeleteRepairOderList";
 import Statistics from "../pages/Statistics";
 
 const HEADER_HEIGHT = 64;
@@ -69,12 +71,17 @@ const MainLayout = () => {
           <Route path="/motos/add" element={<AddMotoForm />} />
           <Route path="/motos/edit/:licensePlate" element={<EditMotoForm />} />
           <Route path="/motos/:licensePlate" element={<MotoDetails />} />
+          <Route path="/motos/deleted/list" element={<DeleteMotoList />} />
 
           {/* Các route cho RepairOrders */}
           <Route path="/repair-orders" element={<RepairOrderList />} />
           <Route path="/repair-orders/add" element={<RepairOrderAdd />} />
           <Route path="/repair-orders/edit/:id" element={<RepairOrderEdit />} />
           <Route path="/repair-orders/:id" element={<RepairOrderDetails />} />
+          <Route
+            path="/repair-orders/deleted/list"
+            element={<DeleteRepairOrderList />}
+          />
 
           {/* Các route cho thống kê */}
           <Route path="/statistics" element={<Statistics />} />

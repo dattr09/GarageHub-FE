@@ -28,6 +28,16 @@ export const AuthAPI = {
   resetPassword: (data, config) =>
     api.post("/users/reset-password", data, config),
   getUserInfo: () => api.get("/users/me"),
+  // ✅ Lấy tất cả user (token nằm trong cookies nên không cần header)
+  getAllUsers: async () => {
+    try {
+      const response = await api.get("/users");
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error fetching users:", error);
+      throw error;
+    }
+  },
 };
 
 export default api;
