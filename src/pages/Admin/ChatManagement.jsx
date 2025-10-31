@@ -13,7 +13,7 @@ const ChatManagement = ({ adminId, adminToken }) => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
-
+  
   // Debug log
   console.log("🔍 ChatManagement loaded");
   console.log("adminId:", adminId);
@@ -132,8 +132,20 @@ const ChatManagement = ({ adminId, adminToken }) => {
       attachments: [],
     };
 
-    socket.emit("send-message", messageData);
+    // Thêm tin nhắn vào UI ngay lập tức (optimistic update)
+    const tempMessage = {
+      _id: `temp-${Date.now()}`, // ID tạm thời
+      message: newMessage.trim(),
+      senderRole: "admin",
+      createdAt: new Date().toISOString(),
+      conversationId: selectedConversation.conversationId,
+    };
+    
+    setMessages((prev) => [...prev, tempMessage]);
     setNewMessage("");
+
+    // Gửi tin nhắn qua socket
+    socket.emit("send-message", messageData);
 
     // Stop typing indicator
     socket.emit("typing", { conversationId: selectedConversation.conversationId, isTyping: false });
@@ -217,18 +229,14 @@ const ChatManagement = ({ adminId, adminToken }) => {
                 >
                   <div className="conversation-avatar">
                     {conv.user?.avatar ? (
-                      <img src={conv.user.avatar} alt={conv.user.username} />
+                      <img src={conv.user.avatar} alt="User" />
                     ) : (
-                      <div className="avatar-placeholder">
-                        {conv.user?.username?.charAt(0).toUpperCase() || "U"}
-                      </div>
+                      <div className="avatar-placeholder">U</div>
                     )}
                   </div>
                   <div className="conversation-info">
                     <div className="conversation-top">
-                      <span className="conversation-name">
-                        {conv.user?.username || "Unknown User"}
-                      </span>
+                      <span className="conversation-name">Unknown User</span>
                       <span className="conversation-time">{formatTime(conv.lastMessageTime)}</span>
                     </div>
                     <div className="conversation-bottom">
@@ -253,19 +261,14 @@ const ChatManagement = ({ adminId, adminToken }) => {
                 <div className="chat-user-info">
                   <div className="chat-user-avatar">
                     {selectedConversation.user?.avatar ? (
-                      <img
-                        src={selectedConversation.user.avatar}
-                        alt={selectedConversation.user.username}
-                      />
+                      <img src={selectedConversation.user.avatar} alt="User" />
                     ) : (
-                      <div className="avatar-placeholder">
-                        {selectedConversation.user?.username?.charAt(0).toUpperCase() || "U"}
-                      </div>
+                      <div className="avatar-placeholder">U</div>
                     )}
                   </div>
                   <div>
-                    <h3>{selectedConversation.user?.username || "Unknown User"}</h3>
-                    <p>{selectedConversation.user?.email}</p>
+                    <h3>Unknown User</h3>
+                    <p>{selectedConversation.user?.email || ""}</p>
                   </div>
                 </div>
               </div>
