@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import "./ChatWidget.css";
 
 const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -19,39 +18,23 @@ const ChatWidget = ({ userId, userToken }) => {
 
   const conversationId = userId; // User's conversation ID
 
-  // Kiểm tra xem user có phải admin không
   useEffect(() => {
     try {
       const userStr = localStorage.getItem("user");
-      console.log("🔍 ChatWidget - userStr from localStorage:", userStr);
-      
       if (userStr) {
         const user = JSON.parse(userStr);
-        console.log("🔍 ChatWidget - parsed user object:", user);
-        console.log("🔍 ChatWidget - user.roles:", user.roles);
-        console.log("🔍 ChatWidget - user.role:", user.role);
-        
-        // Kiểm tra roles array hoặc role string
-        const isAdminUser = 
-          (Array.isArray(user.roles) && user.roles.includes("admin")) ||
-          (Array.isArray(user.roles) && user.roles.includes("ADMIN")) ||
-          user.role === "admin" || 
+        const isAdminUser =
+          (Array.isArray(user.roles) && (user.roles.includes("admin") || user.roles.includes("ADMIN"))) ||
+          user.role === "admin" ||
           user.role === "ADMIN" ||
           user.isAdmin === true;
-        
-        if (isAdminUser) {
-          console.log("✅ User is admin - setting isAdmin to true");
-          setIsAdmin(true);
-        } else {
-          console.log("❌ User is NOT admin");
-        }
+        if (isAdminUser) setIsAdmin(true);
       }
     } catch (error) {
       console.error("Error checking user role:", error);
     }
   }, []);
 
-  // Scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -60,9 +43,7 @@ const ChatWidget = ({ userId, userToken }) => {
     scrollToBottom();
   }, [messages]);
 
-  // Initialize socket connection
   useEffect(() => {
-    // Không khởi tạo socket nếu là admin (vì admin sẽ dùng trang riêng)
     if (!userId || isAdmin) return;
 
     const newSocket = io(`${SOCKET_URL}/chat`, {
@@ -83,13 +64,10 @@ const ChatWidget = ({ userId, userToken }) => {
     });
 
     newSocket.on("user-typing", ({ isTyping: typing, userRole }) => {
-      if (userRole === "admin") {
-        setIsTyping(typing);
-      }
+      if (userRole === "admin") setIsTyping(typing);
     });
 
     newSocket.on("messages-read", () => {
-      // Admin đã đọc tin nhắn
       setMessages((prev) =>
         prev.map((msg) => (msg.senderRole === "user" ? { ...msg, isRead: true } : msg))
       );
@@ -102,7 +80,6 @@ const ChatWidget = ({ userId, userToken }) => {
     };
   }, [userId, isAdmin]);
 
-  // Load chat history
   const loadChatHistory = async () => {
     try {
       const response = await fetch(`${SOCKET_URL}/api/v1/chat/messages/${conversationId}`, {
@@ -111,15 +88,12 @@ const ChatWidget = ({ userId, userToken }) => {
         },
       });
       const data = await response.json();
-      if (data.success) {
-        setMessages(data.messages);
-      }
+      if (data.success) setMessages(data.messages);
     } catch (error) {
       console.error("Error loading chat history:", error);
     }
   };
 
-  // Send message
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !socket) return;
@@ -132,55 +106,32 @@ const ChatWidget = ({ userId, userToken }) => {
 
     socket.emit("send-message", messageData);
     setNewMessage("");
-    
-    // Stop typing indicator
     socket.emit("typing", { conversationId, isTyping: false });
   };
 
-  // Handle typing
   const handleTyping = (e) => {
     setNewMessage(e.target.value);
-
     if (!socket) return;
 
-    // Clear previous timeout
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
-    // Send typing event
     socket.emit("typing", { conversationId, isTyping: true });
 
-    // Stop typing after 1 second of inactivity
     typingTimeoutRef.current = setTimeout(() => {
       socket.emit("typing", { conversationId, isTyping: false });
     }, 1000);
   };
 
-  // Open chat widget or navigate to admin chat
   const handleOpen = () => {
-    console.log("🔍 ChatWidget - handleOpen called");
-    console.log("🔍 ChatWidget - isAdmin:", isAdmin);
-    
-    // Nếu là admin, chuyển hướng đến trang quản lý chat
     if (isAdmin) {
-      console.log("✅ Navigating to /admin/chat");
       navigate("/admin/chat");
       return;
     }
-
-    console.log("📱 Opening chat widget for regular user");
-    // Nếu là user thường, mở widget chat
     setIsOpen(true);
     setUnreadCount(0);
-    
-    // Mark messages as read
-    if (socket) {
-      socket.emit("mark-as-read", { conversationId });
-    }
+    if (socket) socket.emit("mark-as-read", { conversationId });
   };
 
-  // Format time
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -188,88 +139,137 @@ const ChatWidget = ({ userId, userToken }) => {
 
   return (
     <>
-      {/* Chat Button */}
       {!isOpen && (
-        <button className="chat-widget-button" onClick={handleOpen}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="chat-icon"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-            />
-          </svg>
-          {unreadCount > 0 && <span className="chat-badge">{unreadCount}</span>}
+        <button
+          aria-label="Open chat"
+          onClick={handleOpen}
+          className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-2xl flex items-center justify-center transition-transform duration-200 hover:scale-105 z-[1000] group"
+        >
+          {/* small SVG logo inside button */}
+          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+            <svg viewBox="0 0 64 64" className="w-7 h-7 text-white">
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1">
+                  <stop offset="0" stopColor="#7c3aed" />
+                  <stop offset="1" stopColor="#06b6d4" />
+                </linearGradient>
+              </defs>
+              <circle cx="32" cy="32" r="30" fill="url(#g1)" opacity="0.95" />
+              <g fill="#fff">
+                <path d="M20 42c0-7.732 6.268-14 14-14s14 6.268 14 14H20z" opacity="0.95" />
+                <rect x="16" y="18" width="32" height="10" rx="2" opacity="0.95" />
+              </g>
+            </svg>
+          </div>
+
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold border-2 border-white animate-pulse">
+              {unreadCount}
+            </span>
+          )}
         </button>
       )}
 
-      {/* Chat Window */}
       {isOpen && (
-        <div className="chat-widget-window">
-          {/* Header */}
-          <div className="chat-header">
-            <div>
-              <h3>GarageHub Support</h3>
-              <p className="chat-status">Hỗ trợ trực tuyến</p>
+        <div
+          className="fixed bottom-6 right-6 w-[380px] h-[520px] rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[1000] transition-all duration-300 transform-origin-bottom-right"
+          style={{ maxWidth: "calc(100vw - 32px)", maxHeight: "calc(100vh - 100px)" }}
+        >
+          {/* Header with logo (slightly shorter) */}
+          <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shadow-sm">
+                {/* inline logo */}
+                <svg viewBox="0 0 64 64" className="w-7 h-7">
+                  <defs>
+                    <linearGradient id="g2" x1="0" x2="1">
+                      <stop offset="0" stopColor="#8b5cf6" />
+                      <stop offset="1" stopColor="#06b6d4" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="30" fill="url(#g2)" />
+                  <g fill="#fff">
+                    <path d="M22 44c0-8.837 7.163-16 16-16s16 7.163 16 16H22z" />
+                    <rect x="18" y="16" width="28" height="12" rx="2" />
+                  </g>
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold leading-tight">GarageHub Support</h3>
+                <p className="text-xs opacity-90">Hỗ trợ trực tuyến • Thời gian phản hồi nhanh</p>
+              </div>
             </div>
-            <button className="chat-close-btn" onClick={() => setIsOpen(false)}>
-              ✕
-            </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                aria-label="Minimize"
+                onClick={() => setIsOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
-          {/* Messages */}
-          <div className="chat-messages">
-            {messages.map((msg, index) => (
-              <div
-                key={msg._id || index}
-                className={`chat-message ${msg.senderRole === "user" ? "user" : "admin"}`}
-              >
-                <div className="message-content">
-                  <p>{msg.message}</p>
-                  <span className="message-time">{formatTime(msg.createdAt)}</span>
+          {/* Messages area (less padding, shorter) */}
+          <div className="flex-1 overflow-y-auto p-3 bg-gradient-to-b from-white/60 to-gray-50 backdrop-blur-sm">
+            {messages.map((msg, index) => {
+              const isUser = msg.senderRole === "user";
+              return (
+                <div
+                  key={msg._id || index}
+                  className={`mb-3 flex ${isUser ? "justify-end" : "justify-start"} transition-transform duration-150`}
+                >
+                  <div
+                    className={`px-3 py-2 rounded-2xl max-w-[75%] break-words shadow-sm transform transition-all duration-150 ${isUser
+                      ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white hover:scale-[1.01]"
+                      : "bg-white text-gray-800 border border-gray-100 hover:scale-[1.01]"
+                      }`}
+                  >
+                    <p className="text-sm mb-0.5 leading-relaxed">{msg.message}</p>
+                    <div className="flex items-center gap-2 text-xs opacity-70 mt-1">
+                      <span>{formatTime(msg.createdAt)}</span>
+                      {isUser && msg.isRead && (
+                        <svg className="w-3 h-3 text-white opacity-85" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M20 6L9 17l-5-5" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+
             {isTyping && (
-              <div className="chat-message admin">
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+              <div className="mb-3 flex justify-start">
+                <div className="bg-white px-2 py-1.5 rounded-xl shadow-sm flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.12s" }} />
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.24s" }} />
                 </div>
               </div>
             )}
+
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <form className="chat-input-form" onSubmit={handleSendMessage}>
+          {/* Composer (smaller input & button) */}
+          <form className="flex gap-3 p-3 bg-white border-t border-gray-200 items-center" onSubmit={handleSendMessage}>
             <input
               type="text"
               value={newMessage}
               onChange={handleTyping}
               placeholder="Nhập tin nhắn..."
-              className="chat-input"
+              className="flex-1 px-3 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder:opacity-70"
             />
-            <button type="submit" className="chat-send-btn" disabled={!newMessage.trim()}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                />
+
+            <button
+              type="submit"
+              className="group w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center disabled:opacity-50 transform transition hover:scale-105 active:scale-95"
+              disabled={!newMessage.trim()}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 10l9-7 9 7-9 7-9-7z" />
               </svg>
             </button>
           </form>
