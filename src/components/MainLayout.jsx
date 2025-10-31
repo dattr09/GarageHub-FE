@@ -25,6 +25,7 @@ import RepairOrderEdit from "../pages/RepairOrders/RepairOrderEdit";
 import RepairOrderDetails from "../pages/RepairOrders/RepairOrderDetails";
 import ChatManagement from "../pages/Admin/ChatManagement";
 
+
 const HEADER_HEIGHT = 64;
 
 // Layout chính cho toàn bộ trang, chứa Header, Footer và định tuyến các trang con
@@ -78,14 +79,13 @@ const MainLayout = () => {
                     <Route path="/motos" element={<MotoList />} />
                     <Route path="/motos/add" element={<AddMotoForm />} />
                     <Route path="/motos/edit/:licensePlate" element={<EditMotoForm />} />
-                    <Route path="/motos/:id" element={<MotoDetails />} />
+                    <Route path="/motos/:licensePlate" element={<MotoDetails />} />
 
                     {/* Các route cho RepairOrders */}
                     <Route path="/repair-orders" element={<RepairOrderList />} />
                     <Route path="/repair-orders/add" element={<RepairOrderAdd />} />
                     <Route path="/repair-orders/edit/:id" element={<RepairOrderEdit />} />
                     <Route path="/repair-orders/:id" element={<RepairOrderDetails />} />
-
                     {/* Route cho Admin Chat Management */}
                     <Route 
                         path="/admin/chat" 

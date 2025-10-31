@@ -93,6 +93,7 @@ export default function Header() {
                         <Link to="/parts" className="hover:text-blue-600 transition">Phụ tùng</Link>
                         <Link to="/motos" className="hover:text-blue-600 transition">Xe máy</Link>
                         <Link to="/repair-orders" className="hover:text-blue-600 transition">Phiếu sửa chữa</Link>
+                        <Link to="/statistics" className="hover:text-blue-600 transition">Thống kê</Link>
                     </div>
 
                     {/* Cart + User */}
