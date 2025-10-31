@@ -27,16 +27,16 @@ export default function RepairOrderDetails() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const navigate = useNavigate();
-
   useEffect(() => {
     RepairOrderApi.getById(id)
       .then((res) => {
-        // Nếu backend trả về { data: {...} } thì dùng res.data.data, còn nếu trả object trực tiếp thì dùng res.data
-        setOrder(res.data.data || res.data);
-        console.log("Chi tiết phiếu sửa chữa:", res.data);
+        // ✅ Tự động xử lý cả 3 trường hợp (res.data.data, res.data, hoặc res)
+        const order = res.data?.data || res.data || res;
+        setOrder(order);
+        console.log("✅ Chi tiết phiếu sửa chữa:", order);
       })
       .catch((err) => {
-        console.error("Lỗi khi lấy chi tiết phiếu:", err);
+        console.error("❌ Lỗi khi lấy chi tiết phiếu:", err);
         setOrder(null);
       });
   }, [id]);
@@ -44,109 +44,93 @@ export default function RepairOrderDetails() {
   if (!order)
     return (
       <div className="max-w-xl mx-auto mt-8 text-center text-red-500">
-        Không tìm thấy phiếu sửa chữa.
+        {" "}
+        Không tìm thấy phiếu sửa chữa.{" "}
       </div>
     );
 
   return (
     <div className="max-w-4xl mx-auto mt-10 bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-      {/* Tiêu đề căn giữa */}
+      {/* Tiêu đề */}
       <div className="flex flex-col items-center gap-3 mb-8">
         <ClipboardList className="w-9 h-9 text-green-600" />
         <h2 className="text-3xl font-bold text-gray-800 tracking-tight">
           Chi tiết phiếu sửa chữa
         </h2>
       </div>
-      {/* 2 cột, mỗi bên 5 trường */}
+
+      {/* Thông tin chính */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Cột trái */}
         <div className="space-y-5">
-          <div className="flex items-center gap-3">
-            <ListOrdered className="w-6 h-6 text-blue-500" />
-            <span className="font-semibold text-gray-700">Mã phiếu:</span>
-            <span className="text-gray-900">{order.orderId}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <UserRound className="w-6 h-6 text-indigo-500" />
-            <span className="font-semibold text-gray-700">Khách hàng:</span>
-            <span className="text-gray-900">
-              {order.customerId?.fullName || order.customerId?.email}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <UserCog className="w-6 h-6 text-orange-500" />
-            <span className="font-semibold text-gray-700">Nhân viên:</span>
-            <span className="text-gray-900">
-              {order.employeeId?.fullName || order.employeeId?.email}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <CalendarDays className="w-6 h-6 text-gray-500" />
-            <span className="font-semibold text-gray-700">Ngày tạo:</span>
-            <span className="text-gray-900">
-              {new Date(order.createdAt).toLocaleString()}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <BadgeCheck className="w-6 h-6 text-green-500" />
-            <span className="font-semibold text-gray-700">Trạng thái:</span>
-            <span
-              className={`font-bold ${
-                order.status === "Completed"
-                  ? "text-green-700"
-                  : order.status === "Cancelled"
-                  ? "text-red-600"
-                  : "text-yellow-600"
-              }`}
-            >
-              {statusVN[order.status] || order.status}
-            </span>
-          </div>
+          <InfoRow
+            icon={<ListOrdered className="w-6 h-6 text-blue-500" />}
+            label="Mã phiếu"
+            value={order.orderId}
+          />
+          <InfoRow
+            icon={<UserRound className="w-6 h-6 text-indigo-500" />}
+            label="Khách hàng"
+            value={order.customerId?.fullName || order.customerId?.email}
+          />
+          <InfoRow
+            icon={<UserCog className="w-6 h-6 text-orange-500" />}
+            label="Nhân viên"
+            value={order.employeeId?.fullName || order.employeeId?.email}
+          />
+          <InfoRow
+            icon={<CalendarDays className="w-6 h-6 text-gray-500" />}
+            label="Ngày tạo"
+            value={new Date(order.createdAt).toLocaleString()}
+          />
+          <InfoRow
+            icon={<BadgeCheck className="w-6 h-6 text-green-500" />}
+            label="Trạng thái"
+            value={statusVN[order.status] || order.status}
+            valueClass={
+              order.status === "Completed"
+                ? "text-green-700 font-bold"
+                : order.status === "Cancelled"
+                ? "text-red-600 font-bold"
+                : "text-yellow-600 font-bold"
+            }
+          />
         </div>
+
         {/* Cột phải */}
         <div className="space-y-5">
-          <div className="flex items-center gap-3">
-            <CreditCard className="w-6 h-6 text-purple-500" />
-            <span className="font-semibold text-gray-700">Thanh toán:</span>
-            <span className="text-gray-900">{order.paymentMethod}</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <BadgeDollarSign className="w-6 h-6 text-green-600" />
-            <span className="font-semibold text-gray-700">
-              Chi phí sửa chữa:
-            </span>
-            <span className="text-gray-900">
-              {order.repairCosts?.toLocaleString()}₫
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Wrench className="w-6 h-6 text-orange-600" />
-            <span className="font-semibold text-gray-700">Tổng tiền:</span>
-            <span className="text-blue-700 font-bold text-lg">
-              {order.totalAmount?.toLocaleString()}₫
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <StickyNote className="w-6 h-6 text-gray-400" />
-            <span className="font-semibold text-gray-700">Ghi chú:</span>
-            <span className="text-gray-900">
-              {order.notes || (
-                <span className="italic text-gray-400">Không có</span>
-              )}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <FileText className="w-6 h-6 text-gray-500" />
-            <span className="font-semibold text-gray-700">Ngày cập nhật:</span>
-            <span className="text-gray-900">
-              {order.updatedAt
-                ? new Date(order.updatedAt).toLocaleString()
-                : "—"}
-            </span>
-          </div>
+          <InfoRow
+            icon={<CreditCard className="w-6 h-6 text-purple-500" />}
+            label="Thanh toán"
+            value={order.paymentMethod}
+          />
+          <InfoRow
+            icon={<BadgeDollarSign className="w-6 h-6 text-green-600" />}
+            label="Chi phí sửa chữa"
+            value={`${order.repairCosts?.toLocaleString()}₫`}
+          />
+          <InfoRow
+            icon={<Wrench className="w-6 h-6 text-orange-600" />}
+            label="Tổng tiền"
+            value={`${order.totalAmount?.toLocaleString()}₫`}
+            valueClass="text-blue-700 font-bold text-lg"
+          />
+          <InfoRow
+            icon={<StickyNote className="w-6 h-6 text-gray-400" />}
+            label="Ghi chú"
+            value={order.notes || "Không có"}
+          />
+          <InfoRow
+            icon={<FileText className="w-6 h-6 text-gray-500" />}
+            label="Ngày cập nhật"
+            value={
+              order.updatedAt ? new Date(order.updatedAt).toLocaleString() : "—"
+            }
+          />
         </div>
       </div>
-      {/* Danh sách phụ tùng nằm cuối */}
+
+      {/* Danh sách phụ tùng */}
       <div className="mt-10">
         <div className="flex flex-col items-center mb-2">
           <div className="flex items-center gap-2">
@@ -156,6 +140,7 @@ export default function RepairOrderDetails() {
             </span>
           </div>
         </div>
+
         <div className="overflow-x-auto">
           <table className="min-w-full bg-gray-50 border rounded">
             <thead>
@@ -169,11 +154,11 @@ export default function RepairOrderDetails() {
               </tr>
             </thead>
             <tbody>
-              {order.items.map((item, idx) => (
+              {order.items?.map((item, idx) => (
                 <tr key={idx} className="text-center">
                   <td className="px-3 py-2 border">{idx + 1}</td>
                   <td className="px-3 py-2 border">
-                    {item.name || item.partId?.name || "--"}
+                    {item.partId?.name || item.name || "--"}
                   </td>
                   <td className="px-3 py-2 border">
                     {item.partId?.brandId?.name || "--"}
@@ -191,7 +176,8 @@ export default function RepairOrderDetails() {
           </table>
         </div>
       </div>
-      {/* Nút quay lại căn giữa */}
+
+      {/* Nút quay lại */}
       <div className="flex justify-center mt-8">
         <button
           className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-2 rounded-lg shadow"
@@ -201,6 +187,17 @@ export default function RepairOrderDetails() {
           Quay lại danh sách
         </button>
       </div>
+    </div>
+  );
+}
+
+// 🔹 Component phụ: hiển thị dòng thông tin
+function InfoRow({ icon, label, value, valueClass = "" }) {
+  return (
+    <div className="flex items-center gap-3">
+      {icon}
+      <span className="font-semibold text-gray-700">{label}:</span>
+      <span className={`text-gray-900 ${valueClass}`}>{value || "—"}</span>
     </div>
   );
 }

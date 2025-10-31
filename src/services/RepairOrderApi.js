@@ -2,7 +2,11 @@ import api from "./api";
 
 export const RepairOrderApi = {
   getAll: async () => (await api.get("/repair-orders")).data,
-  getById: async (id) => (await api.get(`/repair-orders/${id}`)).data,
+  getById: async (id) => {
+    const res = await api.get(`/repair-orders/${id}`);
+    console.log("📦 API trả về:", res.data);
+    return res.data;
+  },
   create: async (data) => (await api.post("/repair-orders", data)).data,
   update: async (id, data) =>
     (await api.put(`/repair-orders/${id}`, data)).data,

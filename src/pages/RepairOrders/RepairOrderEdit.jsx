@@ -57,8 +57,12 @@ export default function RepairOrderEdit() {
 
         // Lấy dữ liệu phiếu sửa chữa
         const orderRes = await RepairOrderApi.getById(id);
-        console.log("🧾 Repair order response:", orderRes.data);
-        const order = orderRes.data;
+        const order = orderRes.data?.data || orderRes.data || orderRes; // hỗ trợ cả 3 kiểu
+        console.log("🧾 Repair order final object:", order);
+
+        if (!order) {
+          throw new Error("Không có dữ liệu phiếu sửa chữa!");
+        }
 
         setForm({
           customerId: order.customerId?._id || "",
