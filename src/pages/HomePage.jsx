@@ -3,12 +3,24 @@ import NavbarCarousel from "./HomePage/NavbarCarousel";
 import ServiceCards from "./HomePage/ServiceCards";
 import Accessories from "./HomePage/Accessories";
 import FeaturedProducts from "./HomePage/FeaturedProducts";
+import ChatWidget from "../components/ChatWidget";
 import { getAllParts } from "../services/PartsApi";
 import { getAllBrands } from "../services/BrandApi";
 
 export default function HomePage() {
     const [parts, setParts] = useState([]);
     const [brands, setBrands] = useState([]);
+    const [userId, setUserId] = useState(null);
+    const [userToken, setUserToken] = useState(null);
+
+    useEffect(() => {
+        // Lấy thông tin user từ localStorage
+        const storedUserId = localStorage.getItem("userId");
+        const storedToken = localStorage.getItem("token");
+        
+        if (storedUserId) setUserId(storedUserId);
+        if (storedToken) setUserToken(storedToken);
+    }, []);
 
     useEffect(() => {
         const fetchParts = async () => {
@@ -29,6 +41,11 @@ export default function HomePage() {
             <ServiceCards />
             <Accessories parts={parts} />
             <FeaturedProducts parts={parts} brands={brands} />
+            
+            {/* Chat Widget - chỉ hiển thị khi user đã đăng nhập */}
+            {userId && userToken && (
+                <ChatWidget userId={userId} userToken={userToken} />
+            )}
         </div>
     );
 }
