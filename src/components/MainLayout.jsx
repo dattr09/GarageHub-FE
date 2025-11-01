@@ -27,25 +27,25 @@ import ChatManagement from "../pages/Admin/ChatManagement";
 import { FaRobot } from "react-icons/fa";
 import GeminiAsk from "../pages/Gemini/GeminiAsk";
 import ChatWidget from "./ChatWidget";
-
+import Statistics from "../pages/Statistics";
 
 const HEADER_HEIGHT = 64;
 
 // Layout chính cho toàn bộ trang, chứa Header, Footer và định tuyến các trang con
 const MainLayout = () => {
   // Lấy thông tin user từ localStorage
-  const userStr = localStorage.getItem('user');
+  const userStr = localStorage.getItem("user");
   const user = userStr ? JSON.parse(userStr) : null;
-  const userId = localStorage.getItem('userId');
+  const userId = localStorage.getItem("userId");
 
   // Lấy token từ cookie
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
-  const token = getCookie('jwt-token');
+  const token = getCookie("jwt-token");
   const [showGemini, setShowGemini] = useState(false);
 
   return (
@@ -91,13 +91,21 @@ const MainLayout = () => {
           <Route path="/repair-orders/edit/:id" element={<RepairOrderEdit />} />
           <Route path="/repair-orders/:id" element={<RepairOrderDetails />} />
 
+          {/* Route cho Thống kê */}
+          <Route path="/statistics" element={<Statistics />} />
+
           {/* Route cho Gemini AI */}
           <Route path="/gemini/ask" element={<GeminiAsk />} />
 
           {/* Route cho Admin Chat Management */}
           <Route
             path="/admin/chat"
-            element={<ChatManagement adminId={userId || user?.userId} adminToken={token} />}
+            element={
+              <ChatManagement
+                adminId={userId || user?.userId}
+                adminToken={token}
+              />
+            }
           />
         </Routes>
         <Outlet />
