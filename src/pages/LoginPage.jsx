@@ -1,132 +1,108 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { AuthAPI } from "../services/api";
+import { toast } from "react-hot-toast";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
+const containerVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: {
+            staggerChildren: 0.12,
+            delayChildren: 0.1,
+        },
+    },
+    exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
+};
 
-export default function Login() {
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
+const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
-    const [token, setToken] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [focusField, setFocusField] = useState("");
-    const [oauthMessage, setOauthMessage] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Ẩn thông báo đăng nhập sau 3s
-        if (message) {
-            const timer = setTimeout(() => setMessage(""), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [message]);
-
-    useEffect(() => {
-        // Ẩn thông báo phát triển tính năng sau 1.2s
-        if (oauthMessage) {
-            const timer = setTimeout(() => setOauthMessage(""), 1200);
-            return () => clearTimeout(timer);
-        }
-    }, [oauthMessage]);
-
-    // Xử lý đăng nhập
     const handleLogin = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setMessage("");
+        setSuccessMsg("");
+        setErrorMsg("");
         try {
-            const data = await login({ email, password });
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
-            setMessage(data.message || "Đăng nhập thành công.");
-            navigate("/");
+            const response = await AuthAPI.login({ email, password });
+            localStorage.setItem("userId", response.data.user.userId);
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+
+            setSuccessMsg(response.data.message || "Đăng nhập thành công!");
+            toast.success(response.data.message);
+            setTimeout(() => {
+                setSuccessMsg("");
+                navigate("/");
+            }, 2000);
         } catch (error) {
-            setMessage(error.message || "Đăng nhập thất bại.");
+            console.error("Đăng nhập thất bại:", error);
+            setErrorMsg("Đăng nhập thất bại!");
+            toast.error(error.response?.data?.message || "Đăng nhập thất bại!");
+            setTimeout(() => setErrorMsg(""), 3000);
         }
-        setLoading(false);
     };
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.4 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             className="w-full px-8 py-4 relative"
         >
-            {message && (
-                <motion.div
-                    initial={{ opacity: 0, y: -30, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -30, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                    className={`fixed left-1/2 top-8 z-50 -translate-x-1/2 flex items-center gap-3 rounded-xl px-6 py-4 shadow-2xl text-base font-semibold
-        ${message.includes("thành công")
-                            ? "bg-green-50 text-green-700 border border-green-200"
-                            : "bg-red-50 text-red-700 border border-red-200"
-                        }
-        `}
-                    role="alert"
-                >
-                    {message.includes("thành công") ? (
-                        <svg
-                            className="w-6 h-6 text-green-500"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                fill="#bbf7d0"
-                            />
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M9 12l2 2 4-4"
-                            />
-                        </svg>
-                    ) : (
-                        <svg
-                            className="w-6 h-6 text-red-500"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                fill="#fef2f2"
-                            />
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M15 9l-6 6m0-6l6 6"
-                            />
-                        </svg>
-                    )}
-                    <span className="whitespace-pre-line">{message}</span>
-                </motion.div>
-            )}
-
-            <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow">
+            <AnimatePresence>
+                {successMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-blue-200 text-green-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        style={{ minWidth: 280, maxWidth: "90vw" }}
+                    >
+                        <FaCheckCircle className="text-green-700 text-2xl" />
+                        <span className="truncate text-center">{successMsg}</span>
+                    </motion.div>
+                )}
+                {errorMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-red-200 text-red-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        style={{ minWidth: 280, maxWidth: "90vw" }}
+                    >
+                        <FaTimesCircle className="text-red-500 text-2xl" />
+                        <span className="truncate text-center">{errorMsg}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <motion.h2
+                variants={itemVariants}
+                className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow"
+            >
                 Đăng nhập
-            </h2>
-            <form onSubmit={handleLogin} className="space-y-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                >
+            </motion.h2>
+            <motion.form
+                variants={itemVariants}
+                onSubmit={handleLogin}
+                className="space-y-4"
+            >
+                {/* Email */}
+                <motion.div variants={itemVariants}>
                     <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
                         Email
                     </label>
@@ -141,11 +117,11 @@ export default function Login() {
                             autoComplete="username"
                             placeholder="Nhập email của bạn"
                             className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "email"
+        ${focusField === "email"
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                placeholder-gray-400`}
+        placeholder-gray-400 outline-none`}
                         />
                         <motion.span
                             initial={false}
@@ -156,15 +132,12 @@ export default function Login() {
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
                             transition={{ duration: 0.2 }}
                         >
-                            <i className="fas fa-envelope"></i>
+                            <FaEnvelope />
                         </motion.span>
                     </div>
                 </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                >
+                {/* Mật khẩu */}
+                <motion.div variants={itemVariants}>
                     <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
                         Mật khẩu
                     </label>
@@ -183,7 +156,7 @@ export default function Login() {
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                placeholder-gray-400`}
+                placeholder-gray-400 outline-none`}
                         />
                         <span
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
@@ -194,12 +167,13 @@ export default function Login() {
                             style={{ padding: 0 }}
                         >
                             {showPassword ? (
-                                <i className="fas fa-eye-slash"></i>
+                                <FaEyeSlash />
                             ) : (
-                                <i className="fas fa-eye"></i>
+                                <FaEye />
                             )}
                         </span>
                     </div>
+                    {/* Nút quên mật khẩu */}
                     <div className="text-right mt-2">
                         <button
                             type="button"
@@ -210,61 +184,29 @@ export default function Login() {
                         </button>
                     </div>
                 </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                >
+                {/* Nút đăng nhập */}
+                <motion.div variants={itemVariants}>
                     <button
                         type="submit"
-                        disabled={loading}
-                        className="cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 disabled:opacity-60 text-lg tracking-wide flex items-center justify-center gap-2"
+                        className="cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 text-lg tracking-wide flex items-center justify-center gap-2"
                     >
-                        {loading ? (
-                            <>
-                                <svg
-                                    className="animate-spin h-6 w-6 text-white"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                    ></path>
-                                </svg>
-                                Đang đăng nhập...
-                            </>
-                        ) : (
-                            "Đăng nhập"
-                        )}
+                        Đăng nhập
                     </button>
                 </motion.div>
-            </form>
+            </motion.form>
 
-            <div className="flex items-center my-4">
+            {/* Phân cách "hoặc" */}
+            <motion.div variants={itemVariants} className="flex items-center my-4">
                 <div className="flex-grow h-px bg-gray-300"></div>
                 <span className="mx-4 text-gray-500 font-semibold">hoặc</span>
                 <div className="flex-grow h-px bg-gray-300"></div>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col gap-3">
-                <motion.button
+            {/* Đăng nhập với Google hoặc Apple */}
+            <motion.div variants={itemVariants} className="flex flex-col gap-3">
+                <button
                     type="button"
-                    whileHover={{ scale: 1.04, boxShadow: "0 4px 24px #4285f433" }}
-                    whileTap={{ scale: 0.97 }}
                     className="w-full flex items-center justify-center gap-3 py-2 rounded-lg bg-white border border-gray-300 shadow hover:bg-gray-50 transition"
-                    onClick={() =>
-                        setOauthMessage("Tính năng đăng nhập Google sẽ sớm có!")
-                    }
                 >
                     <img
                         src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -274,15 +216,10 @@ export default function Login() {
                     <span className="font-semibold text-gray-700 text-sm">
                         Đăng nhập với Google
                     </span>
-                </motion.button>
-                <motion.button
+                </button>
+                <button
                     type="button"
-                    whileHover={{ scale: 1.04, boxShadow: "0 4px 24px #00000033" }}
-                    whileTap={{ scale: 0.97 }}
                     className="w-full flex items-center justify-center gap-3 py-2 rounded-lg bg-black border border-gray-800 shadow hover:bg-gray-900 transition"
-                    onClick={() =>
-                        setOauthMessage("Tính năng đăng nhập Apple sẽ sớm có!")
-                    }
                 >
                     <svg
                         className="w-6 h-6 text-white"
@@ -294,48 +231,12 @@ export default function Login() {
                     <span className="font-semibold text-white text-sm">
                         Đăng nhập với Apple
                     </span>
-                </motion.button>
-            </div>
+                </button>
+            </motion.div>
 
-            {oauthMessage && (
-                <motion.div
-                    initial={{ opacity: 0, y: -30, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -30, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                    className="fixed left-1/2 top-20 z-50 -translate-x-1/2 flex items-center gap-3 rounded-xl px-6 py-4 shadow-2xl text-base font-semibold bg-blue-50 text-blue-700 border border-blue-200"
-                    role="alert"
-                    style={{ cursor: "pointer" }}
-                >
-                    <svg
-                        className="w-6 h-6 text-blue-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            fill="#dbeafe"
-                        />
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M13 16h-1v-4h-1m-1-4h.01"
-                        />
-                    </svg>
-                    <span className="whitespace-pre-line">{oauthMessage}</span>
-                </motion.div>
-            )}
-
+            {/* Đăng ký */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                variants={itemVariants}
                 className="mt-8 text-center"
             >
                 <span className="text-gray-600 text-base">Chưa có tài khoản?</span>
@@ -347,17 +248,8 @@ export default function Login() {
                     Đăng ký
                 </button>
             </motion.div>
-
-            {token && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="mt-4 p-3 bg-blue-50 rounded text-xs text-blue-800 break-all text-center"
-                >
-                    <b>Token:</b> <code>{token}</code>
-                </motion.div>
-            )}
         </motion.div>
     );
-}
+};
+
+export default LoginPage;

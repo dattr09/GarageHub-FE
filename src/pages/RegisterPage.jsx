@@ -1,245 +1,244 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { AuthAPI } from "../services/api";
+import { toast } from "react-hot-toast";
+import { FaUser, FaPhone, FaMapMarkerAlt, FaEnvelope, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-export default function Register() {
+const containerVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: {
+            staggerChildren: 0.12,
+            delayChildren: 0.1,
+        },
+    },
+    exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
+const RegisterPage = () => {
+    const [fullName, setFullName] = useState("");
+    const [dateOfBirth, setDateOfBirth] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [address, setAddress] = useState("");
     const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
-    const [dob, setDob] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false);
     const [focusField, setFocusField] = useState("");
-    const [passwordValid, setPasswordValid] = useState(null);
-    const [passwordChecks, setPasswordChecks] = useState({
-        length: false,
-        upper: false,
-        lower: false,
-        number: false,
-        special: false,
-    });
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
     const navigate = useNavigate();
 
-    // Kiểm tra điều kiện mật khẩu hợp lệ
-    const checkPassword = (pwd) => {
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-        return regex.test(pwd);
-    };
-
-    // Kiểm tra chi tiết các tiêu chí mật khẩu
-    const checkPasswordDetail = (pwd) => ({
-        length: pwd.length >= 8,
-        upper: /[A-Z]/.test(pwd),
-        lower: /[a-z]/.test(pwd),
-        number: /\d/.test(pwd),
-        special: /[\W_]/.test(pwd),
-    });
-
-    // Xử lý thay đổi mật khẩu và cập nhật trạng thái kiểm tra
-    const handlePasswordChange = (e) => {
-        const value = e.target.value;
-        setPassword(value);
-        setPasswordValid(value.length > 0 ? checkPassword(value) : null);
-        setPasswordChecks(checkPasswordDetail(value));
-    };
-
-    // Xử lý đăng ký tài khoản
     const handleRegister = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setMessage("");
-        const data = {
-            email: email,
-            password: password,
-            username: username,
-        };
+        setSuccessMsg("");
+        setErrorMsg("");
         try {
-            await register(data);
-            localStorage.setItem("pendingEmail", email);
-            localStorage.setItem("pendingPassword", password);
-            setLoading(false);
-            navigate("/confirm-email");
-        } catch (error) {
-            setLoading(false);
-            if (error.details?.errors) {
-                const messages = Object.values(error.details.errors).flat();
-                setMessage(messages.join(" | "));
-            } else {
-                setMessage(error.message || "Đăng ký thất bại.");
+            const response = await AuthAPI.register({
+                fullName,
+                dateOfBirth,
+                phoneNumber,
+                address,
+                email,
+                password,
+            });
+
+            if (response.status === 201) {
+                setSuccessMsg(response.data.message || "Đăng ký thành công!");
+                toast.success(response.data.message, { duration: 3000 });
+                localStorage.setItem("emailForVerification", email);
+                setTimeout(() => {
+                    setSuccessMsg("");
+                    navigate("/verify-email");
+                }, 3000);
             }
+        } catch (error) {
+            setErrorMsg("Đăng ký thất bại!");
+            toast.error("Đăng ký thất bại!");
+            setTimeout(() => setErrorMsg(""), 3000);
+        } finally {
+            setLoading(false);
         }
     };
 
-    useEffect(() => {
-        // Ẩn thông báo sau 3s
-        if (message) {
-            const timer = setTimeout(() => setMessage(""), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [message]);
-
     return (
         <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 50 }}
-            transition={{ duration: 0.4 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             className="w-full px-8 py-4 relative"
         >
-            {message && (
-                <motion.div
-                    initial={{ opacity: 0, y: -30, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -30, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                    className={`fixed left-1/2 top-8 z-50 -translate-x-1/2 flex items-center gap-3 rounded-xl px-6 py-4 shadow-2xl text-base font-semibold
-          ${message.includes("thành công")
-                            ? "bg-green-50 text-green-700 border border-green-200"
-                            : "bg-red-50 text-red-700 border border-red-200"
-                        }
-        `}
-                    role="alert"
-                >
-                    {message.includes("thành công") ? (
-                        <svg
-                            className="w-6 h-6 text-green-500"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                fill="#bbf7d0"
-                            />
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M9 12l2 2 4-4"
-                            />
-                        </svg>
-                    ) : (
-                        <svg
-                            className="w-6 h-6 text-red-500"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                fill="#fef2f2"
-                            />
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M15 9l-6 6m0-6l6 6"
-                            />
-                        </svg>
-                    )}
-                    <span className="whitespace-pre-line">{message}</span>
-                </motion.div>
-            )}
-
-            <h2 className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow">
+            <AnimatePresence>
+                {successMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-blue-200 text-green-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        style={{ minWidth: 280, maxWidth: "90vw" }}
+                    >
+                        <FaCheckCircle className="text-green-700 text-2xl" />
+                        <span className="truncate text-center">{successMsg}</span>
+                    </motion.div>
+                )}
+                {errorMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-red-200 text-red-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        style={{ minWidth: 280, maxWidth: "90vw" }}
+                    >
+                        <FaTimesCircle className="text-red-500 text-2xl" />
+                        <span className="truncate text-center">{errorMsg}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <motion.h2
+                variants={itemVariants}
+                className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow"
+            >
                 Đăng ký
-            </h2>
-            <form onSubmit={handleRegister} className="space-y-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 }}
-                >
-                    <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
-                        Tên người dùng
-                    </label>
+            </motion.h2>
+            <motion.form
+                variants={itemVariants}
+                onSubmit={handleRegister}
+                className="space-y-4"
+            >
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Nhập tên của bạn"
+                            placeholder="Nhập họ và tên"
                             required
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            onFocus={() => setFocusField("username")}
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            onFocus={() => setFocusField("fullName")}
                             onBlur={() => setFocusField("")}
-                            className={`w-full px-4 py-2 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "username"
+                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                                ${focusField === "fullName"
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                         <motion.span
                             initial={false}
                             animate={{
-                                opacity: focusField === "username" ? 1 : 0,
-                                x: focusField === "username" ? 0 : -10,
+                                opacity: focusField === "fullName" ? 1 : 0,
+                                x: focusField === "fullName" ? 0 : -10,
                             }}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
                             transition={{ duration: 0.2 }}
                         >
-                            <i className="fas fa-user"></i>
+                            <FaUser />
                         </motion.span>
                     </div>
                 </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.08 }}
-                >
-                    <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
-                        Ngày sinh
-                    </label>
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="date"
                             required
-                            value={dob}
-                            onChange={(e) => setDob(e.target.value)}
-                            onFocus={() => setFocusField("dob")}
+                            value={dateOfBirth}
+                            onChange={(e) => setDateOfBirth(e.target.value)}
+                            onFocus={() => setFocusField("dateOfBirth")}
                             onBlur={() => setFocusField("")}
-                            className={`w-full px-4 py-2 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "dob"
+                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                                ${focusField === "dateOfBirth"
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                     </div>
                 </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                >
-                    <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
-                        Email
-                    </label>
+                <motion.div variants={itemVariants}>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Nhập số điện thoại"
+                            required
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            onFocus={() => setFocusField("phoneNumber")}
+                            onBlur={() => setFocusField("")}
+                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                                ${focusField === "phoneNumber"
+                                    ? "border-blue-500 ring-2 ring-blue-200"
+                                    : "border-gray-300 focus:border-blue-400"
+                                }
+                                placeholder-gray-400 outline-none`}
+                        />
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: focusField === "phoneNumber" ? 1 : 0,
+                                x: focusField === "phoneNumber" ? 0 : -10,
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
+                            transition={{ duration: 0.2 }}
+                        >
+                            <FaPhone />
+                        </motion.span>
+                    </div>
+                </motion.div>
+                <motion.div variants={itemVariants}>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Nhập địa chỉ"
+                            required
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            onFocus={() => setFocusField("address")}
+                            onBlur={() => setFocusField("")}
+                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                                ${focusField === "address"
+                                    ? "border-blue-500 ring-2 ring-blue-200"
+                                    : "border-gray-300 focus:border-blue-400"
+                                }
+                                placeholder-gray-400 outline-none`}
+                        />
+                        <motion.span
+                            initial={false}
+                            animate={{
+                                opacity: focusField === "address" ? 1 : 0,
+                                x: focusField === "address" ? 0 : -10,
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
+                            transition={{ duration: 0.2 }}
+                        >
+                            <FaMapMarkerAlt />
+                        </motion.span>
+                    </div>
+                </motion.div>
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="email"
-                            placeholder="Nhập email của bạn"
+                            placeholder="Nhập email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             onFocus={() => setFocusField("email")}
                             onBlur={() => setFocusField("")}
-                            autoComplete="email"
-                            className={`w-full px-4 py-2 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "email"
+                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                                ${focusField === "email"
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                         <motion.span
                             initial={false}
@@ -250,37 +249,29 @@ export default function Register() {
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
                             transition={{ duration: 0.2 }}
                         >
-                            <i className="fas fa-envelope"></i>
+                            <FaEnvelope />
                         </motion.span>
                     </div>
                 </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
-                        Mật khẩu
-                    </label>
+                <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
                             placeholder="Nhập mật khẩu"
                             required
                             value={password}
-                            onChange={handlePasswordChange}
+                            onChange={(e) => setPassword(e.target.value)}
                             onFocus={() => setFocusField("password")}
                             onBlur={() => setFocusField("")}
-                            autoComplete="new-password"
-                            className={`w-full px-4 py-2 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                ${focusField === "password"
+                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
+                                ${focusField === "password"
                                     ? "border-blue-500 ring-2 ring-blue-200"
                                     : "border-gray-300 focus:border-blue-400"
                                 }
-                placeholder-gray-400`}
+                                placeholder-gray-400 outline-none`}
                         />
                         <span
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
+                            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
                             onClick={() => setShowPassword((v) => !v)}
                             tabIndex={0}
                             role="button"
@@ -288,95 +279,27 @@ export default function Register() {
                             style={{ padding: 0 }}
                         >
                             {showPassword ? (
-                                <i className="fas fa-eye-slash"></i>
+                                <FaEyeSlash />
                             ) : (
-                                <i className="fas fa-eye"></i>
+                                <FaEye />
                             )}
                         </span>
                     </div>
-                    {(focusField === "password" || password.length > 0) && (
-                        <div className="mt-2">
-                            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-medium">
-                                <div className="flex items-center gap-1">
-                                    {passwordChecks.length ? (
-                                        <span className="text-green-600">✔️</span>
-                                    ) : (
-                                        <span className="text-red-500">❌</span>
-                                    )}
-                                    <span>Ít nhất 8 ký tự</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    {passwordChecks.upper && passwordChecks.lower ? (
-                                        <span className="text-green-600">✔️</span>
-                                    ) : (
-                                        <span className="text-red-500">❌</span>
-                                    )}
-                                    <span>Có chữ hoa & thường</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    {passwordChecks.number ? (
-                                        <span className="text-green-600">✔️</span>
-                                    ) : (
-                                        <span className="text-red-500">❌</span>
-                                    )}
-                                    <span>Có số</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    {passwordChecks.special ? (
-                                        <span className="text-green-600">✔️</span>
-                                    ) : (
-                                        <span className="text-red-500">❌</span>
-                                    )}
-                                    <span>Ký tự đặc biệt</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                >
+                <motion.div variants={itemVariants}>
                     <button
                         type="submit"
                         disabled={loading}
-                        className="cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 disabled:opacity-60 text-lg tracking-wide flex items-center justify-center gap-2"
+                        className={`cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 text-lg tracking-wide flex items-center justify-center gap-2
+                        ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
                     >
-                        {loading ? (
-                            <>
-                                <svg
-                                    className="animate-spin h-6 w-6 text-white"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                    ></path>
-                                </svg>
-                                Đang đăng ký...
-                            </>
-                        ) : (
-                            "Đăng ký"
-                        )}
+                        {loading ? "Đang đăng ký..." : "Đăng ký"}
                     </button>
                 </motion.div>
-            </form>
+            </motion.form>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                variants={itemVariants}
                 className="mt-8 text-center"
             >
                 <span className="text-gray-600 text-base">Đã có tài khoản?</span>
@@ -390,4 +313,6 @@ export default function Register() {
             </motion.div>
         </motion.div>
     );
-}
+};
+
+export default RegisterPage;
