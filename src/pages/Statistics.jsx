@@ -20,7 +20,14 @@ export default function Statistics() {
     const [stats, setStats] = useState(null);
 
     useEffect(() => {
-        getStatistics({ type, month, year, quarter }).then(setStats);
+        // Đảm bảo month luôn là 2 chữ số khi truyền lên backend
+        const params = {
+            type,
+            month: month < 10 ? `0${month}` : `${month}`,
+            year,
+            quarter
+        };
+        getStatistics(params).then(setStats);
     }, [type, month, year, quarter]);
 
     // Chuẩn bị dữ liệu cho biểu đồ
