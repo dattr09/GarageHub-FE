@@ -155,10 +155,12 @@ const PartsList = () => {
     };
 
     useEffect(() => {
-        // Lấy brand từ query string nếu có
+        // Lấy brand và search từ query string nếu có
         const params = new URLSearchParams(location.search);
         const brandFromUrl = params.get("brand");
+        const searchFromUrl = params.get("search");
         if (brandFromUrl) setSelectedBrand(brandFromUrl);
+        if (searchFromUrl) setSearchTerm(searchFromUrl);
     }, [location.search]);
 
     return (
