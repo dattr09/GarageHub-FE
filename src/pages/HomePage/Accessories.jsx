@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, Settings2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getAllParts } from "../../services/PartsApi"; // Import API lấy danh sách phụ tùng
+import { getBackendImgURL } from "../../utils/helper";
 
 const ITEMS_PER_ROW = 9;
 const ROWS_DEFAULT = 2;
@@ -68,7 +69,7 @@ export default function Accessories() {
                     >
                         <div className="w-20 h-20 flex items-center justify-center">
                             <img
-                                src={item.img}
+                                src={getBackendImgURL(item.img)}
                                 alt={item.name}
                                 className="w-full h-full object-contain rounded-xl group-hover:scale-105 transition-transform duration-300"
                             />

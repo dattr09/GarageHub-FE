@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trash2, ShoppingCart, ChevronLeft, CheckCircle, XCircle } from "lucide-react";
+import { getBackendImgURL } from "../utils/helper";
 
 export default function Cart() {
     const [cart, setCart] = useState([]);
@@ -78,7 +79,7 @@ export default function Cart() {
                                     <tr key={item.id || index} className="hover:bg-slate-50 transition">
                                         <td className="p-3">
                                             <img
-                                                src={item.image}
+                                                src={getBackendImgURL(item.image)}
                                                 alt={item.name}
                                                 className="w-14 h-14 object-contain rounded-lg shadow-sm transform hover:scale-105 duration-300"
                                             />
