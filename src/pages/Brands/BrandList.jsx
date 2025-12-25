@@ -3,6 +3,7 @@ import { getAllBrands, deleteBrand } from "../../services/BrandApi";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Eye, Edit, Trash2, PlusCircle, ClipboardList, Search } from "lucide-react";
+import { getBackendImgURL } from "../../utils/helper";
 
 const BrandList = () => {
     const [brands, setBrands] = useState([]);
@@ -125,7 +126,7 @@ const BrandList = () => {
                                     <td className="px-4 py-3">{brand.name}</td>
                                     <td className="px-4 py-3">
                                         <img
-                                            src={brand.image || "https://via.placeholder.com/150"}
+                                            src={getBackendImgURL(brand.image)}
                                             alt={brand.name}
                                             className="w-12 h-12 object-cover rounded-lg border mx-auto"
                                         />

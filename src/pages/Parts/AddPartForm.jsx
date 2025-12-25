@@ -16,7 +16,8 @@ const AddPartForm = () => {
     const [limitStock, setLimitStock] = useState(0);
     const [brandId, setBrandId] = useState("");
     const [brands, setBrands] = useState([]); // State để lưu danh sách thương hiệu
-    const [image, setImage] = useState(""); // State để lưu ảnh đã chọn
+    const [imageFile, setImageFile] = useState(null); // State để lưu file ảnh
+    const [imagePreview, setImagePreview] = useState(""); // State để preview ảnh
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -44,9 +45,10 @@ const AddPartForm = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            setImageFile(file);
             const reader = new FileReader();
             reader.onload = () => {
-                setImage(reader.result); // Lưu ảnh dưới dạng base64
+                setImagePreview(reader.result); // Preview ảnh
             };
             reader.readAsDataURL(file);
         }
@@ -77,18 +79,19 @@ const AddPartForm = () => {
         setLoading(true);
 
         try {
-            const partData = {
-                name,
-                quantity,
-                price,
-                buyPrice,
-                empPrice,
-                unit,
-                limitStock,
-                brandId,
-                image,
-            };
-            await createPart(partData);
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("quantity", quantity);
+            formData.append("price", price);
+            formData.append("buyPrice", buyPrice);
+            formData.append("empPrice", empPrice);
+            formData.append("unit", unit);
+            formData.append("limitStock", limitStock);
+            formData.append("brandId", brandId);
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
+            await createPart(formData);
 
             Swal.fire({
                 title: "Thêm thành công!",
@@ -264,10 +267,10 @@ const AddPartForm = () => {
                     </div>
 
                     {/* Hiển thị ảnh đã chọn */}
-                    {image && (
+                    {imagePreview && (
                         <div className="mt-6 flex justify-center">
                             <img
-                                src={image}
+                                src={imagePreview}
                                 alt="Ảnh đã chọn"
                                 className="w-32 h-32 object-cover rounded-lg border border-gray-200 shadow-md"
                             />

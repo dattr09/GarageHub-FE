@@ -25,7 +25,7 @@ export default function MotoDetails() {
 
     if (loading)
         return (
-            <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4">
+            <div className="absolute top-0 left-0 w-full min-h-screen bg-black/40 z-40 flex items-center justify-center p-4 pt-20">
                 <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-2xl flex items-center justify-center p-8">
                     <span className="text-gray-600 text-lg">⏳ Đang tải thông tin xe...</span>
                 </div>
@@ -33,7 +33,7 @@ export default function MotoDetails() {
         );
     if (!moto)
         return (
-            <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4">
+            <div className="absolute top-0 left-0 w-full min-h-screen bg-black/40 z-40 flex items-center justify-center p-4 pt-20">
                 <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-2xl flex items-center justify-center p-8">
                     <span className="text-red-500 text-lg">❌ Không tìm thấy thông tin xe!</span>
                 </div>
@@ -41,7 +41,7 @@ export default function MotoDetails() {
         );
 
     return (
-        <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4">
+        <div className="absolute top-0 left-0 w-full min-h-screen bg-black/40 z-40 flex items-center justify-center p-4 pt-20">
             <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-2xl">
                 {/* Header */}
                 <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-100">

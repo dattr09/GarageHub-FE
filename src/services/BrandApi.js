@@ -20,11 +20,13 @@ export const getBrandById = async (brandId) => {
   }
 };
 
-export const createBrand = async (brandData, token) => {
+export const createBrand = async (formData) => {
     try {
-        const response = await api.post("/brands", brandData, {
+        const token = localStorage.getItem("token");
+        const response = await api.post("/brands", formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
             },
         });
         return response.data;
@@ -34,11 +36,13 @@ export const createBrand = async (brandData, token) => {
     }
 };
 
-export const updateBrand = async (id, brandData, token) => {
+export const updateBrand = async (id, formData) => {
     try {
-        const response = await api.put(`/brands/${id}`, brandData, {
+        const token = localStorage.getItem("token");
+        const response = await api.put(`/brands/${id}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
             },
         });
         return response.data;

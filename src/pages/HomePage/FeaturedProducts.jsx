@@ -5,6 +5,7 @@ import PartDetails from "../Parts/PartDetails";
 import Swal from "sweetalert2";
 import { getAllParts } from "../../services/PartsApi"; // Import API lấy danh sách phụ tùng
 import { getAllBrands } from "../../services/BrandApi"; // Import API lấy danh sách thương hiệu
+import { getBackendImgURL } from "../../utils/helper";
 
 export default function FeaturedProducts() {
     const PRODUCTS_PER_PAGE = 5;
@@ -88,7 +89,7 @@ export default function FeaturedProducts() {
                             onClick={() => setSelectedPart(item)}
                         >
                             <img
-                                src={item.image || item.img}
+                                src={getBackendImgURL(item.image || item.img)}
                                 alt={item.name}
                                 className="w-24 h-24 object-contain mb-4 rounded-xl group-hover:scale-105 transition"
                             />
@@ -169,7 +170,7 @@ export default function FeaturedProducts() {
                             <BadgeCheck className="absolute top-2 right-2 w-6 h-6 text-green-500 bg-white rounded-full shadow" />
                             <div className="w-20 h-20 mb-2 flex items-center justify-center">
                                 <img
-                                    src={brand.image}
+                                    src={getBackendImgURL(brand.image)}
                                     alt={brand.name}
                                     className="w-full h-full object-contain rounded-xl transition-transform duration-300 group-hover:scale-110"
                                 />

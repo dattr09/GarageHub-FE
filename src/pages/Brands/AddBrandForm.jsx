@@ -17,16 +17,18 @@ const fadeInStyle = `
 
 const AddBrandForm = () => {
     const [name, setName] = useState("");
-    const [image, setImage] = useState("");
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            setImageFile(file);
             const reader = new FileReader();
             reader.onload = () => {
-                setImage(reader.result);
+                setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
         }
@@ -37,8 +39,12 @@ const AddBrandForm = () => {
         setLoading(true);
 
         try {
-            const brandData = { name, image };
-            await createBrand(brandData);
+            const formData = new FormData();
+            formData.append("name", name);
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
+            await createBrand(formData);
 
             Swal.fire({
                 title: "Thêm thành công!",
@@ -86,8 +92,8 @@ const AddBrandForm = () => {
                             {/* Preview / Avatar */}
                             <div className="flex-none">
                                 <div className="w-28 h-28 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
-                                    {image ? (
-                                        <img src={image} alt="preview" className="w-full h-full object-cover" />
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="text-gray-400 text-sm text-center px-2">Preview</div>
                                     )}

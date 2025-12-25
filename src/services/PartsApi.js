@@ -23,11 +23,13 @@ export const getPartById = async (id) => {
 };
 
 // Thêm phụ tùng mới
-export const createPart = async (partData, token) => {
+export const createPart = async (formData) => {
     try {
-        const response = await api.post("/parts", partData, {
+        const token = localStorage.getItem("token");
+        const response = await api.post("/parts", formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
             },
         });
         return response.data;
@@ -38,11 +40,13 @@ export const createPart = async (partData, token) => {
 };
 
 // Cập nhật phụ tùng
-export const updatePart = async (id, partData, token) => {
+export const updatePart = async (id, formData) => {
     try {
-        const response = await api.put(`/parts/${id}`, partData, {
+        const token = localStorage.getItem("token");
+        const response = await api.put(`/parts/${id}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
             },
         });
         return response.data;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPartById } from "../../services/PartsApi";
 import { Package, Layers, DollarSign, Archive, Tag, Image, Edit } from "lucide-react";
+import { getBackendImgURL } from "../../utils/helper";
 
 const PartDetails = () => {
     const { id } = useParams();
@@ -30,7 +31,7 @@ const PartDetails = () => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4">
+        <div className="absolute top-0 left-0 w-full min-h-screen bg-black/40 z-40 flex items-center justify-center p-4 pt-20">
             <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-2xl">
                 {/* Header */}
                 <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-100">
@@ -46,7 +47,7 @@ const PartDetails = () => {
                     <div className="flex justify-center mb-6">
                         <div className="w-48 h-48 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden shadow-md">
                             <img
-                                src={part.image || "https://via.placeholder.com/150"}
+                                src={getBackendImgURL(part.image)}
                                 alt={part.name}
                                 className="w-full h-full object-contain"
                             />

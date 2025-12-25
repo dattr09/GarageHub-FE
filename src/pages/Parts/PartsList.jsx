@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { Layers, DollarSign, Tag, Archive, Package, XCircle, Edit, Search, ShoppingCart } from "lucide-react";
+import { getBackendImgURL } from "../../utils/helper";
 
 const PartsList = () => {
     const [parts, setParts] = useState([]);
@@ -233,16 +234,16 @@ const PartsList = () => {
                         {/* Hình ảnh */}
                         <div className="flex justify-center items-center mb-3">
                             <img
-                                src={part.image || "https://via.placeholder.com/150"}
+                                src={getBackendImgURL(part.image)}
                                 alt={part.name}
                                 className="w-36 h-26 object-contain rounded-lg bg-white"
                             />
                         </div>
 
                         {/* Thông tin sản phẩm */}
-                        <div className="text-center">
+                        <div className="text-left">
                             <h2
-                                className="text-lg font-bold text-blue-600 mb-1 cursor-pointer hover:underline"
+                                className="text-lg font-bold text-blue-600 text-center mb-1 cursor-pointer hover:underline"
                                 onClick={() => navigate(`/parts/${part._id}`)}
                             >
                                 {part.name}

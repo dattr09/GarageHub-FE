@@ -4,6 +4,7 @@ import { getBrandById, updateBrand } from "../../services/BrandApi";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2"; // Import SweetAlert2
 import "sweetalert2/dist/sweetalert2.min.css"; // Import CSS của SweetAlert2
+import { getBackendImgURL } from "../../utils/helper";
 
 const fadeInStyle = `
 @keyframes fadeIn {
@@ -18,7 +19,9 @@ const fadeInStyle = `
 const EditBrandForm = () => {
     const { id } = useParams();
     const [name, setName] = useState("");
-    const [image, setImage] = useState("");
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState("");
+    const [existingImageId, setExistingImageId] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -27,7 +30,10 @@ const EditBrandForm = () => {
             try {
                 const brand = await getBrandById(id);
                 setName(brand.name);
-                setImage(brand.image);
+                setExistingImageId(brand.image);
+                if (brand.image) {
+                    setImagePreview(getBackendImgURL(brand.image));
+                }
             } catch (error) {
                 console.error("Error fetching brand:", error);
             }
@@ -39,9 +45,10 @@ const EditBrandForm = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            setImageFile(file);
             const reader = new FileReader();
             reader.onload = () => {
-                setImage(reader.result); // Convert file to base64 string
+                setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
         }
@@ -52,9 +59,12 @@ const EditBrandForm = () => {
         setLoading(true);
 
         try {
-            const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
-            const brandData = { name, image };
-            await updateBrand(id, brandData, token);
+            const formData = new FormData();
+            formData.append("name", name);
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
+            await updateBrand(id, formData);
 
             // Hiển thị thông báo thành công
             Swal.fire({
@@ -106,9 +116,9 @@ const EditBrandForm = () => {
                             {/* Preview / Avatar */}
                             <div className="flex-none">
                                 <div className="w-28 h-28 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
-                                    {image ? (
+                                    {imagePreview ? (
                                         <img
-                                            src={image}
+                                            src={imagePreview}
                                             alt="preview"
                                             className="w-full h-full object-cover"
                                         />

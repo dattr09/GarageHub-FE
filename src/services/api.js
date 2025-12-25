@@ -1,8 +1,8 @@
 import axios from "axios";
-console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
+import Config from "../envVars";
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_BACKEND_URL}/api/v1`,
+  baseURL: `${Config.BACKEND_URL}/api/v1`,
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });

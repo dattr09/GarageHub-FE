@@ -5,6 +5,7 @@ import { getAllBrands } from "../../services/BrandApi";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import { getBackendImgURL } from "../../utils/helper";
 
 const EditPartForm = () => {
     const { id } = useParams();
@@ -17,7 +18,9 @@ const EditPartForm = () => {
     const [limitStock, setLimitStock] = useState(0);
     const [brandId, setBrandId] = useState("");
     const [brands, setBrands] = useState([]);
-    const [image, setImage] = useState("");
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState("");
+    const [existingImageId, setExistingImageId] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -39,7 +42,10 @@ const EditPartForm = () => {
                 setUnit(part.unit);
                 setLimitStock(part.limitStock);
                 setBrandId(part.brandId?._id || part.brandId);
-                setImage(part.image);
+                setExistingImageId(part.image);
+                if (part.image) {
+                    setImagePreview(getBackendImgURL(part.image));
+                }
             } catch (error) {
                 console.error("Error fetching part:", error);
             }
@@ -61,9 +67,10 @@ const EditPartForm = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            setImageFile(file);
             const reader = new FileReader();
             reader.onload = () => {
-                setImage(reader.result);
+                setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
         }
@@ -94,18 +101,19 @@ const EditPartForm = () => {
         setLoading(true);
 
         try {
-            const partData = {
-                name,
-                quantity,
-                price,
-                buyPrice,
-                empPrice,
-                unit,
-                limitStock,
-                brandId,
-                image,
-            };
-            await updatePart(id, partData);
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("quantity", quantity);
+            formData.append("price", price);
+            formData.append("buyPrice", buyPrice);
+            formData.append("empPrice", empPrice);
+            formData.append("unit", unit);
+            formData.append("limitStock", limitStock);
+            formData.append("brandId", brandId);
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
+            await updatePart(id, formData);
 
             Swal.fire({
                 title: "Cập nhật thành công!",
@@ -281,10 +289,10 @@ const EditPartForm = () => {
                     </div>
 
                     {/* Hiển thị ảnh đã chọn */}
-                    {image && (
+                    {imagePreview && (
                         <div className="mt-6 flex justify-center">
                             <img
-                                src={image}
+                                src={imagePreview}
                                 alt="Ảnh đã chọn"
                                 className="w-32 h-32 object-cover rounded-lg border border-gray-200 shadow-md"
                             />

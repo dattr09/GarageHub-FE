@@ -3,6 +3,7 @@ import { Edit, XCircle, Landmark, Package } from "lucide-react";
 import { getBrandById } from "../../services/BrandApi";
 import { getPartsByBrand } from "../../services/PartsApi";
 import { useParams, useNavigate } from "react-router-dom";
+import { getBackendImgURL } from "../../utils/helper";
 
 const fadeInStyle = `
 @keyframes fadeIn {
@@ -71,7 +72,7 @@ const BrandDetails = () => {
                             {/* Image */}
                             <div className="w-28 h-28 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden mb-4">
                                 <img
-                                    src={brand.image || "https://via.placeholder.com/150"}
+                                    src={getBackendImgURL(brand.image)}
                                     alt={brand.name}
                                     className="w-full h-full object-cover"
                                 />
@@ -103,7 +104,7 @@ const BrandDetails = () => {
                                                 {/* Hiển thị ảnh */}
                                                 <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
                                                     <img
-                                                        src={part.image || "https://via.placeholder.com/150"}
+                                                        src={getBackendImgURL(part.image)}
                                                         alt={part.name}
                                                         className="w-full h-full object-cover"
                                                     />
