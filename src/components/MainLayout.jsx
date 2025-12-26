@@ -28,6 +28,10 @@ import { FaRobot } from "react-icons/fa";
 import GeminiAsk from "../pages/Gemini/GeminiAsk";
 import ChatWidget from "./ChatWidget";
 import Statistics from "../pages/Statistics";
+import BookAppointment from "../pages/Appointments/BookAppointment";
+import AppointmentList from "../pages/Appointments/AppointmentList";
+import SearchAppointment from "../pages/Appointments/SearchAppointment";
+import AppointmentNotification from "./AppointmentNotification";
 
 const HEADER_HEIGHT = 64;
 
@@ -94,6 +98,11 @@ const MainLayout = () => {
           {/* Route cho Thống kê */}
           <Route path="/statistics" element={<Statistics />} />
 
+          {/* Route cho Đặt lịch sửa xe */}
+          <Route path="/appointments/book" element={<BookAppointment />} />
+          <Route path="/appointments/search" element={<SearchAppointment />} />
+          <Route path="/appointments" element={<AppointmentList />} />
+
           {/* Route cho Gemini AI */}
           <Route path="/gemini/ask" element={<GeminiAsk />} />
 
@@ -111,6 +120,8 @@ const MainLayout = () => {
         <Outlet />
       </main>
       <Footer />
+      {/* Component nhận thông báo lịch hẹn mới (chỉ cho admin/employee) */}
+      <AppointmentNotification />
       {/* Nút mở Gemini AI */}
       {!showGemini && (
         <button

@@ -46,8 +46,8 @@ export default function RepairOrderAdd() {
                 const meRes = await api.get("/auth/me");
                 setEmployee(meRes.data);
 
-                const usersRes = await api.get("/auth/users");
-                setCustomers(usersRes.data.filter(u => u.roles?.includes("user")));
+                const customersRes = await api.get("/repair-orders/customers/with-motos");
+                setCustomers(customersRes.data);
                 const partsRes = await api.get("/parts");
                 setParts(partsRes.data);
             } catch (err) {
