@@ -43,15 +43,13 @@ const LoginPage = () => {
             localStorage.setItem("user", JSON.stringify(response.data.user));
 
             setSuccessMsg(response.data.message || "Đăng nhập thành công!");
-            toast.success(response.data.message);
             setTimeout(() => {
                 setSuccessMsg("");
                 navigate("/");
             }, 2000);
         } catch (error) {
             console.error("Đăng nhập thất bại:", error);
-            setErrorMsg("Đăng nhập thất bại!");
-            toast.error(error.response?.data?.message || "Đăng nhập thất bại!");
+            setErrorMsg(error.response?.data?.message || "Đăng nhập thất bại!");
             setTimeout(() => setErrorMsg(""), 3000);
         }
     };
