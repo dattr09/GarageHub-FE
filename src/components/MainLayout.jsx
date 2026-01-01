@@ -24,7 +24,7 @@ import RepairOrderAdd from "../pages/RepairOrders/RepairOrderAdd";
 import RepairOrderEdit from "../pages/RepairOrders/RepairOrderEdit";
 import RepairOrderDetails from "../pages/RepairOrders/RepairOrderDetails";
 import ChatManagement from "../pages/Admin/ChatManagement";
-import { FaRobot } from "react-icons/fa";
+import { Sparkles } from "lucide-react";
 import GeminiAsk from "../pages/Gemini/GeminiAsk";
 import ChatWidget from "./ChatWidget";
 import Statistics from "../pages/Statistics";
@@ -125,11 +125,12 @@ const MainLayout = () => {
       {/* Nút mở Gemini AI */}
       {!showGemini && (
         <button
-          className="fixed bottom-26 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-2xl flex items-center justify-center z-[1000] hover:scale-105 transition"
+          className="fixed bottom-24 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-sky-400 via-blue-500 to-cyan-500 shadow-xl flex items-center justify-center z-[1000] hover:scale-110 transition-transform"
+          style={{ boxShadow: "0 4px 20px rgba(14, 165, 233, 0.4)" }}
           onClick={() => setShowGemini(true)}
           aria-label="Open Gemini AI"
         >
-          <FaRobot className="text-3xl text-white" />
+          <Sparkles className="w-6 h-6 text-white" />
         </button>
       )}
       {/* Cửa sổ chat Gemini AI */}

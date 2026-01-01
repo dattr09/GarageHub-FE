@@ -92,3 +92,30 @@ export const updatePartQuantity = async (partId, quantity) => {
         throw error;
     }
 };
+
+// Lấy danh sách đánh giá của phụ tùng
+export const getPartReviews = async (partId) => {
+    try {
+        const response = await api.get(`/parts/${partId}/reviews`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching reviews:", error);
+        throw error;
+    }
+};
+
+// Tạo đánh giá mới cho phụ tùng
+export const createPartReview = async (partId, reviewData) => {
+    try {
+        const token = localStorage.getItem("token");
+        const response = await api.post(`/parts/${partId}/reviews`, reviewData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error creating review:", error.response?.data || error.message);
+        throw error;
+    }
+};

@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { Edit, XCircle, Landmark, Package } from "lucide-react";
+import { Edit2, ArrowLeft, Tag, Package, Star, ShoppingCart } from "lucide-react";
 import { getBrandById } from "../../services/BrandApi";
 import { getPartsByBrand } from "../../services/PartsApi";
 import { useParams, useNavigate } from "react-router-dom";
 import { getBackendImgURL } from "../../utils/helper";
 
-const fadeInStyle = `
-@keyframes fadeIn {
-  0% { opacity: 0; transform: translateY(8px) scale(0.98); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-.animate-fade-in {
-  animation: fadeIn 0.28s ease-in-out;
-}
-`;
-
 const BrandDetails = () => {
     const { id } = useParams();
     const [brand, setBrand] = useState(null);
     const [parts, setParts] = useState([]);
+    const [isAdmin, setIsAdmin] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        try {
+            const userStr = localStorage.getItem("user");
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                const adminCheck =
+                    (Array.isArray(user.roles) && (user.roles.includes("admin") || user.roles.includes("ADMIN"))) ||
+                    user.role === "admin" ||
+                    user.role === "ADMIN" ||
+                    user.isAdmin === true;
+                setIsAdmin(adminCheck);
+            }
+        } catch (e) { }
+    }, []);
 
     useEffect(() => {
         const fetchBrand = async () => {
@@ -33,8 +39,8 @@ const BrandDetails = () => {
 
         const fetchParts = async () => {
             try {
-                const parts = await getPartsByBrand(id);
-                setParts(parts);
+                const partsData = await getPartsByBrand(id);
+                setParts(partsData);
             } catch (error) {
                 console.error("Error fetching parts:", error);
             }
@@ -44,105 +50,125 @@ const BrandDetails = () => {
         fetchParts();
     }, [id]);
 
+    const formatPrice = (price) => new Intl.NumberFormat("vi-VN").format(price);
+
+    const renderStars = (rating) => (
+        <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                    key={star}
+                    className={`w-3 h-3 ${star <= Math.round(rating || 0) ? "text-amber-400 fill-amber-400" : "text-gray-200"}`}
+                />
+            ))}
+        </div>
+    );
+
     if (!brand) {
-        return <p>Loading brand details...</p>;
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="animate-pulse text-gray-400">Đang tải...</div>
+            </div>
+        );
     }
 
     return (
-        <>
-            <style>{fadeInStyle}</style>
-
-            {/* Overlay */}
-            <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-                {/* Card */}
-                <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-2xl animate-fade-in">
-                    {/* Header */}
-                    <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-100">
-                        <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-2">
-                            <Landmark className="text-blue-600 w-6 h-6" />
-                        </div>
-                        <h3 className="text-2xl font-semibold text-gray-800 text-center">
-                            Chi tiết thương hiệu
-                        </h3>
-                    </div>
-
-                    {/* Content */}
-                    <div className="px-6 py-6">
-                        <div className="flex flex-col items-center">
-                            {/* Image */}
-                            <div className="w-28 h-28 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden mb-4">
-                                <img
-                                    src={getBackendImgURL(brand.image)}
-                                    alt={brand.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-
-                            {/* Brand Name */}
-                            <h2 className="text-lg font-semibold text-gray-800">{brand.name}</h2>
-                        </div>
-
-                        {/* Parts List */}
-                        <div className="mt-6">
-                            <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Package className="w-5 h-5 text-gray-500" /> Phụ tùng thuộc thương hiệu
-                            </h4>
-                            <div
-                                className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4"
-                                style={{
-                                    scrollbarWidth: "thin",
-                                    scrollbarColor: "#cbd5e0 #f7fafc",
-                                }}
-                            >
-                                {parts.length > 0 ? (
-                                    <ul className="space-y-4">
-                                        {parts.map((part) => (
-                                            <li
-                                                key={part._id}
-                                                className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg shadow"
-                                            >
-                                                {/* Hiển thị ảnh */}
-                                                <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
-                                                    <img
-                                                        src={getBackendImgURL(part.image)}
-                                                        alt={part.name}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                </div>
-
-                                                {/* Hiển thị tên */}
-                                                <h5 className="text-md font-semibold text-gray-800">{part.name}</h5>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p className="text-sm text-gray-600">Không có phụ tùng nào thuộc thương hiệu này.</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="mt-6 flex items-center justify-center gap-4 px-6 pb-6">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
+                <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+                    <button
+                        onClick={() => navigate("/brands")}
+                        className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                        <span className="font-medium">Quay lại</span>
+                    </button>
+                    {isAdmin && (
                         <button
-                            type="button"
-                            onClick={() => navigate("/brands")}
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-2 rounded-md shadow-sm flex items-center gap-2"
-                        >
-                            <XCircle className="w-5 h-5" /> Quay lại
-                        </button>
-
-                        <button
-                            type="button"
                             onClick={() => navigate(`/brands/edit/${id}`)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md flex items-center gap-2 shadow"
+                            className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors"
                         >
-                            <Edit className="w-5 h-5" /> Sửa
+                            <Edit2 className="w-4 h-4" />
+                            Chỉnh sửa
                         </button>
-                    </div>
+                    )}
                 </div>
             </div>
-        </>
+
+            {/* Main Content */}
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                {/* Brand Info */}
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-8">
+                    <div className="p-8 flex flex-col md:flex-row items-center gap-8">
+                        {/* Brand Image */}
+                        <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-2xl border border-gray-100 flex items-center justify-center overflow-hidden shadow-lg">
+                            <img
+                                src={getBackendImgURL(brand.image)}
+                                alt={brand.name}
+                                className="w-full h-full object-contain p-4"
+                            />
+                        </div>
+
+                        {/* Brand Info */}
+                        <div className="text-center md:text-left">
+                            <p className="text-blue-600 font-medium text-sm uppercase tracking-wide mb-2">Thương hiệu</p>
+                            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{brand.name}</h1>
+                            <p className="text-gray-500">{parts.length} phụ tùng</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Parts from this brand */}
+                <div className="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <Package className="w-5 h-5 text-blue-500" />
+                        Phụ tùng thuộc thương hiệu
+                    </h3>
+
+                    {parts.length === 0 ? (
+                        <div className="text-center py-12">
+                            <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                            <p className="text-gray-500">Chưa có phụ tùng nào</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                            {parts.map((part) => (
+                                <div
+                                    key={part._id}
+                                    className="group bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all overflow-hidden cursor-pointer"
+                                    onClick={() => navigate(`/parts/${part._id}`)}
+                                >
+                                    {/* Image */}
+                                    <div className="aspect-square bg-white p-3 border-b border-gray-50">
+                                        <img
+                                            src={getBackendImgURL(part.image)}
+                                            alt={part.name}
+                                            className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                                        />
+                                    </div>
+
+                                    {/* Info */}
+                                    <div className="p-3">
+                                        <h4 className="font-medium text-gray-800 text-sm line-clamp-2 mb-2">{part.name}</h4>
+                                        <div className="flex items-center gap-1.5 mb-2">
+                                            {renderStars(part.averageRating)}
+                                            <span className="text-xs font-medium text-gray-600">{(part.averageRating || 0).toFixed(1)}</span>
+                                            <span className="text-xs text-gray-400">({part.reviewCount || 0} đánh giá)</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-blue-600 font-bold">{formatPrice(part.price)}₫</span>
+                                            <span className={`text-xs px-1.5 py-0.5 rounded ${part.quantity > 0 ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}>
+                                                {part.quantity > 0 ? "Còn hàng" : "Hết"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
     );
 };
 

@@ -1,10 +1,9 @@
-// src/components/motos/AddMotoForm.jsx
 import { useState, useEffect } from "react";
 import { createMoto } from "../../services/MotoApi";
 import { getAllBrands } from "../../services/BrandApi";
 import { AuthAPI } from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { Bike, Tag, Palette, Building2, User, Image, Save, XCircle } from "lucide-react";
+import { Bike, Tag, Palette, Building2, User, Save, ArrowLeft } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
@@ -15,7 +14,6 @@ export default function AddMotoForm() {
         color: "",
         brandId: "",
         userId: "",
-        image: "",
     });
     const [brands, setBrands] = useState([]);
     const [users, setUsers] = useState([]);
@@ -28,7 +26,7 @@ export default function AddMotoForm() {
                 const res = await getAllBrands();
                 setBrands(res.data || res);
             } catch (err) {
-                console.error("❌ Lỗi khi lấy danh sách hãng:", err);
+                console.error("Lỗi khi lấy danh sách hãng:", err);
             }
         };
         const fetchUsers = async () => {
@@ -36,7 +34,7 @@ export default function AddMotoForm() {
                 const res = await AuthAPI.getAllUsers();
                 setUsers(res.data || res);
             } catch (err) {
-                console.error("❌ Lỗi khi lấy danh sách người dùng:", err);
+                console.error("Lỗi khi lấy danh sách người dùng:", err);
             }
         };
         fetchBrands();
@@ -47,158 +45,155 @@ export default function AddMotoForm() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setFormData((prev) => ({ ...prev, image: reader.result }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
             await createMoto(formData);
             Swal.fire({
-                title: "Thành công!",
-                text: "Xe đã được thêm vào danh sách.",
+                title: "Thêm thành công!",
                 icon: "success",
-                confirmButtonColor: "#3085d6",
-                confirmButtonText: "OK",
-            }).then(() => {
-                navigate("/motos");
-            });
+                timer: 1500,
+                showConfirmButton: false,
+            }).then(() => navigate("/motos"));
         } catch (err) {
-            console.error("❌ Lỗi thêm xe:", err);
-            Swal.fire({
-                title: "Lỗi!",
-                text: "Không thể thêm xe!",
-                icon: "error",
-                confirmButtonColor: "#d33",
-                confirmButtonText: "OK",
-            });
+            Swal.fire({ title: "Lỗi!", text: "Không thể thêm xe!", icon: "error" });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-3xl">
-                {/* Header */}
-                <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-100">
-                    <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-2">
-                        <Bike className="text-green-600 w-6 h-6" />
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
+                <div className="max-w-3xl mx-auto px-4 py-8">
+                    <div className="flex flex-col items-center text-center">
+                        <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm mb-3">
+                            <Bike className="w-7 h-7" />
+                        </div>
+                        <h1 className="text-3xl font-bold mb-1">Thêm Xe Máy Mới</h1>
+                        <p className="text-white/80 text-sm">Đăng ký xe vào hệ thống</p>
                     </div>
-                    <h3 className="text-2xl font-semibold text-gray-800 text-center">Thêm xe máy</h3>
                 </div>
+            </div>
 
-                <form onSubmit={handleSubmit} className="px-6 py-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Biển số xe */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-gray-500" /> Biển số xe
-                            </label>
-                            <input
-                                name="licensePlate"
-                                placeholder="Biển số xe"
-                                value={formData.licensePlate}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-                            />
+            {/* Form */}
+            <div className="max-w-3xl mx-auto px-4 -mt-4 pb-8">
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                    <form onSubmit={handleSubmit} className="p-6 md:p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {/* Biển số */}
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <Tag className="w-4 h-4 inline mr-2 text-gray-400" />
+                                    Biển số xe
+                                </label>
+                                <input
+                                    name="licensePlate"
+                                    placeholder="VD: 59F1-12345"
+                                    value={formData.licensePlate}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all uppercase font-mono text-lg"
+                                />
+                            </div>
+
+                            {/* Model */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <Bike className="w-4 h-4 inline mr-2 text-gray-400" />
+                                    Mẫu xe
+                                </label>
+                                <input
+                                    name="model"
+                                    placeholder="VD: Wave Alpha, Vision..."
+                                    value={formData.model}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                />
+                            </div>
+
+                            {/* Màu xe */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <Palette className="w-4 h-4 inline mr-2 text-gray-400" />
+                                    Màu xe
+                                </label>
+                                <input
+                                    name="color"
+                                    placeholder="VD: Đỏ, Đen, Trắng..."
+                                    value={formData.color}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                />
+                            </div>
+
+                            {/* Hãng xe */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <Building2 className="w-4 h-4 inline mr-2 text-gray-400" />
+                                    Hãng xe
+                                </label>
+                                <select
+                                    name="brandId"
+                                    value={formData.brandId}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                >
+                                    <option value="">Chọn hãng xe</option>
+                                    {brands.map((b) => (
+                                        <option key={b._id} value={b._id}>{b.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Chủ xe */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <User className="w-4 h-4 inline mr-2 text-gray-400" />
+                                    Chủ sở hữu
+                                </label>
+                                <select
+                                    name="userId"
+                                    value={formData.userId}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                >
+                                    <option value="">Chọn chủ xe</option>
+                                    {users.map((u) => (
+                                        <option key={u._id} value={u._id}>
+                                            {u.fullName} ({u.phoneNumber || u.email})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
-                        {/* Model */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <Tag className="w-4 h-4 text-gray-500" /> Model
-                            </label>
-                            <input
-                                name="model"
-                                placeholder="Mẫu xe"
-                                value={formData.model}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-                            />
-                        </div>
-                        {/* Màu xe */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <Palette className="w-4 h-4 text-gray-500" /> Màu xe
-                            </label>
-                            <input
-                                name="color"
-                                placeholder="Màu xe"
-                                value={formData.color}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-                            />
-                        </div>
-                        {/* Hãng xe */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <Building2 className="w-4 h-4 text-gray-500" /> Hãng xe
-                            </label>
-                            <select
-                                name="brandId"
-                                value={formData.brandId}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+
+                        {/* Buttons */}
+                        <div className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-gray-100">
+                            <button
+                                type="button"
+                                onClick={() => navigate("/motos")}
+                                className="flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-all"
                             >
-                                <option value="">Chọn hãng xe</option>
-                                {brands.map((b) => (
-                                    <option key={b._id} value={b._id}>
-                                        {b.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        {/* Người sở hữu */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                <User className="w-4 h-4 text-gray-500" /> Người sở hữu
-                            </label>
-                            <select
-                                name="userId"
-                                value={formData.userId}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+                                <ArrowLeft className="w-5 h-5" />
+                                Quay lại
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
                             >
-                                <option value="">Chọn người sở hữu</option>
-                                {users.map((u) => (
-                                    <option key={u._id} value={u._id}>
-                                        {u.fullName} ({u.phoneNumber || "Không có số điện thoại"})
-                                    </option>
-                                ))}
-                            </select>
+                                <Save className="w-5 h-5" />
+                                {loading ? "Đang lưu..." : "Lưu xe"}
+                            </button>
                         </div>
-                    </div>
-                    <div className="mt-6 flex items-center justify-center gap-4">
-                        <button
-                            type="button"
-                            onClick={() => navigate("/motos")}
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-2 rounded-md shadow-sm flex items-center gap-2"
-                        >
-                            <XCircle className="w-5 h-5" /> Hủy
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className={`bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md flex items-center gap-2 shadow ${loading ? "opacity-60 cursor-not-allowed" : ""
-                                }`}
-                        >
-                            <Save className="w-5 h-5" /> {loading ? "Đang lưu..." : "Lưu"}
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     );

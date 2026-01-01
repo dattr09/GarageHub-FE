@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Phone, Mail, Car, Wrench, FileText, Save } from "lucide-react";
+import { Calendar, Clock, User, Phone, Mail, Bike, Wrench, FileText, Save, CheckCircle } from "lucide-react";
 import { AppointmentApi } from "../../services/AppointmentApi";
 import Swal from "sweetalert2";
 
 const SERVICE_OPTIONS = [
-  { value: "Thay nhớt", label: "Thay nhớt" },
-  { value: "Sửa phanh", label: "Sửa phanh" },
-  { value: "Kiểm tra động cơ", label: "Kiểm tra động cơ" },
-  { value: "Bảo dưỡng định kỳ", label: "Bảo dưỡng định kỳ" },
+  { value: "Thay nhớt", label: "Thay nhớt", icon: "🛢️" },
+  { value: "Sửa phanh", label: "Sửa phanh", icon: "🔧" },
+  { value: "Kiểm tra động cơ", label: "Kiểm tra động cơ", icon: "⚙️" },
+  { value: "Bảo dưỡng định kỳ", label: "Bảo dưỡng định kỳ", icon: "🔩" },
 ];
 
 const VEHICLE_TYPES = [
@@ -36,7 +36,6 @@ export default function BookAppointment() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  // Lấy khung giờ khả dụng khi chọn ngày
   useEffect(() => {
     if (form.date) {
       fetchAvailableSlots(form.date);
@@ -74,25 +73,21 @@ export default function BookAppointment() {
     setLoading(true);
 
     try {
-      // Validate
       if (!form.customerName || !form.phone || !form.date || !form.time || !form.vehicleType || form.services.length === 0) {
-        Swal.fire("Lỗi", "Vui lòng điền đầy đủ thông tin bắt buộc", "error");
+        Swal.fire("Lỗi", "Vui lòng điền đầy đủ thông tin", "error");
         setLoading(false);
         return;
       }
 
       const res = await AppointmentApi.create(form);
-      Swal.fire("Thành công", res.data.message || "Đặt lịch thành công!", "success").then(() => {
-        // Reset form
+      Swal.fire({
+        title: "Đặt lịch thành công!",
+        text: res.data.message || "Chúng tôi sẽ liên hệ xác nhận sớm nhất",
+        icon: "success",
+      }).then(() => {
         setForm({
-          customerName: "",
-          phone: "",
-          email: "",
-          date: "",
-          time: "",
-          vehicleType: "",
-          services: [],
-          note: "",
+          customerName: "", phone: "", email: "", date: "", time: "",
+          vehicleType: "", services: [], note: "",
         });
         setAvailableSlots([]);
       });
@@ -109,195 +104,207 @@ export default function BookAppointment() {
     return { available: slot.available, count: slot.count };
   };
 
-  // Lấy ngày tối thiểu (hôm nay)
-  const getMinDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  };
+  const getMinDate = () => new Date().toISOString().split("T")[0];
 
   return (
-    <div className="max-w-4xl mx-auto p-8 mt-10 rounded-lg shadow-md bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-100">
-      <div className="flex flex-col items-center mb-6">
-        <div className="flex items-center gap-2 text-blue-600">
-          <Calendar className="w-8 h-8" />
-          <h2 className="text-3xl font-bold text-blue-800">Đặt lịch sửa xe</h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white">
+        <div className="max-w-3xl mx-auto px-4 py-8">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm mb-3">
+              <Calendar className="w-7 h-7" />
+            </div>
+            <h1 className="text-3xl font-bold mb-1">Đặt Lịch Sửa Xe</h1>
+            <p className="text-white/80 text-sm">Điền thông tin để đặt lịch hẹn</p>
+          </div>
         </div>
-        <p className="text-gray-600">Vui lòng điền đầy đủ thông tin bên dưới</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Thông tin khách hàng */}
-        <div className="bg-blue-50 rounded-lg p-6 shadow">
-          <h3 className="font-semibold text-blue-700 mb-4">Thông tin khách hàng</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="flex items-center gap-2 font-medium mb-1 text-gray-700">
+      {/* Form */}
+      <div className="max-w-3xl mx-auto px-4 -mt-4 pb-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-6 md:p-8">
+            {/* Thông tin khách hàng */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <User className="w-5 h-5 text-blue-500" />
-                Họ tên <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="customerName"
-                value={form.customerName}
-                onChange={handleChange}
-                required
-                className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-200"
-                placeholder="Nhập họ tên"
-              />
+                Thông tin khách hàng
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Họ tên <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="customerName"
+                    value={form.customerName}
+                    onChange={handleChange}
+                    required
+                    placeholder="Nhập họ tên"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Số điện thoại <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    required
+                    placeholder="0xxx xxx xxx"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email (không bắt buộc)
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="email@example.com"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="flex items-center gap-2 font-medium mb-1 text-gray-700">
-                <Phone className="w-5 h-5 text-blue-500" />
-                Số điện thoại <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={form.phone}
-                onChange={handleChange}
-                required
-                className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-200"
-                placeholder="Nhập số điện thoại"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="flex items-center gap-2 font-medium mb-1 text-gray-700">
-                <Mail className="w-5 h-5 text-blue-500" />
-                Email (không bắt buộc)
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-200"
-                placeholder="Nhập email (nếu có)"
-              />
-            </div>
-          </div>
-        </div>
 
-        {/* Thông tin đặt lịch */}
-        <div className="bg-green-50 rounded-lg p-6 shadow">
-          <h3 className="font-semibold text-green-700 mb-4">Thông tin đặt lịch</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="flex items-center gap-2 font-medium mb-1 text-gray-700">
+            {/* Thông tin đặt lịch */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-green-500" />
-                Ngày sửa <span className="text-red-500">*</span>
+                Thông tin đặt lịch
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Ngày sửa <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={form.date}
+                    onChange={handleChange}
+                    required
+                    min={getMinDate()}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Giờ sửa <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="time"
+                    value={form.time}
+                    onChange={handleChange}
+                    required
+                    disabled={!form.date || loadingSlots}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all disabled:opacity-50"
+                  >
+                    <option value="">-- Chọn giờ --</option>
+                    {TIME_SLOTS.map((time) => {
+                      const status = getSlotStatus(time);
+                      return (
+                        <option key={time} value={time} disabled={!status.available}>
+                          {time} {!status.available ? "(Đã đầy)" : `(${status.count}/3)`}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Loại xe <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex flex-wrap gap-3">
+                    {VEHICLE_TYPES.map((type) => (
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => setForm({ ...form, vehicleType: type.value })}
+                        className={`px-5 py-2.5 rounded-xl border-2 font-medium transition-all flex items-center gap-2 ${form.vehicleType === type.value
+                          ? "border-green-500 bg-green-50 text-green-700"
+                          : "border-gray-200 text-gray-600 hover:border-gray-300"
+                          }`}
+                      >
+                        <Bike className="w-4 h-4" />
+                        {type.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Dịch vụ */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Wrench className="w-5 h-5 text-orange-500" />
+                Dịch vụ cần sửa <span className="text-red-500">*</span>
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {SERVICE_OPTIONS.map((service) => (
+                  <button
+                    key={service.value}
+                    type="button"
+                    onClick={() => handleServiceChange(service.value)}
+                    className={`p-4 rounded-xl border-2 text-left transition-all ${form.services.includes(service.value)
+                      ? "border-orange-500 bg-orange-50"
+                      : "border-gray-200 hover:border-gray-300"
+                      }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{service.icon}</span>
+                      {form.services.includes(service.value) && (
+                        <CheckCircle className="w-5 h-5 text-orange-500" />
+                      )}
+                    </div>
+                    <p className={`font-medium text-sm ${form.services.includes(service.value) ? "text-orange-700" : "text-gray-700"}`}>
+                      {service.label}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Ghi chú */}
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <FileText className="w-4 h-4 inline mr-2 text-gray-400" />
+                Ghi chú thêm (không bắt buộc)
               </label>
-              <input
-                type="date"
-                name="date"
-                value={form.date}
+              <textarea
+                name="note"
+                value={form.note}
                 onChange={handleChange}
-                required
-                min={getMinDate()}
-                className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-200"
+                rows={3}
+                placeholder="Mô tả thêm tình trạng xe..."
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
               />
             </div>
-            <div>
-              <label className="flex items-center gap-2 font-medium mb-1 text-gray-700">
-                <Clock className="w-5 h-5 text-green-500" />
-                Giờ sửa <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="time"
-                value={form.time}
-                onChange={handleChange}
-                required
-                disabled={!form.date || loadingSlots}
-                className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-200"
+
+            {/* Submit */}
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
               >
-                <option value="">-- Chọn giờ --</option>
-                {TIME_SLOTS.map((time) => {
-                  const status = getSlotStatus(time);
-                  return (
-                    <option
-                      key={time}
-                      value={time}
-                      disabled={!status.available}
-                    >
-                      {time} {!status.available ? "(Đã đầy)" : `(${status.count}/3)`}
-                    </option>
-                  );
-                })}
-              </select>
-              {loadingSlots && <p className="text-sm text-gray-500 mt-1">Đang tải khung giờ...</p>}
+                <Save className="w-5 h-5" />
+                {loading ? "Đang xử lý..." : "Đặt lịch ngay"}
+              </button>
             </div>
-            <div className="md:col-span-2">
-              <label className="flex items-center gap-2 font-medium mb-1 text-gray-700">
-                <Car className="w-5 h-5 text-green-500" />
-                Loại xe <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="vehicleType"
-                value={form.vehicleType}
-                onChange={handleChange}
-                required
-                className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-200"
-              >
-                <option value="">-- Chọn loại xe --</option>
-                {VEHICLE_TYPES.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          </form>
         </div>
-
-        {/* Dịch vụ cần sửa */}
-        <div className="bg-orange-50 rounded-lg p-6 shadow">
-          <h3 className="font-semibold text-orange-700 mb-4 flex items-center gap-2">
-            <Wrench className="w-5 h-5" />
-            Dịch vụ cần sửa <span className="text-red-500">*</span>
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {SERVICE_OPTIONS.map((service) => (
-              <label key={service.value} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.services.includes(service.value)}
-                  onChange={() => handleServiceChange(service.value)}
-                  className="w-5 h-5 accent-orange-600"
-                />
-                <span className="text-gray-700">{service.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Ghi chú */}
-        <div className="bg-gray-50 rounded-lg p-6 shadow">
-          <label className="flex items-center gap-2 font-medium mb-1 text-gray-700">
-            <FileText className="w-5 h-5 text-gray-500" />
-            Ghi chú thêm (không bắt buộc)
-          </label>
-          <textarea
-            name="note"
-            value={form.note}
-            onChange={handleChange}
-            rows={3}
-            className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-gray-200"
-            placeholder="Ghi chú thêm (nếu có)..."
-          />
-        </div>
-
-        {/* Nút submit */}
-        <div className="flex justify-center mt-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white px-8 py-3 rounded-lg flex items-center gap-2 font-semibold shadow-lg disabled:opacity-50 transition"
-          >
-            <Save className="w-5 h-5" />
-            {loading ? "Đang xử lý..." : "Đặt lịch"}
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 }
-
