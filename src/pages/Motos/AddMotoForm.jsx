@@ -65,7 +65,6 @@ export default function AddMotoForm() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
                 <div className="max-w-3xl mx-auto px-4 py-8">
                     <div className="flex flex-col items-center text-center">
@@ -78,12 +77,10 @@ export default function AddMotoForm() {
                 </div>
             </div>
 
-            {/* Form */}
             <div className="max-w-3xl mx-auto px-4 -mt-4 pb-8">
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                     <form onSubmit={handleSubmit} className="p-6 md:p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            {/* Biển số */}
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Tag className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -99,7 +96,6 @@ export default function AddMotoForm() {
                                 />
                             </div>
 
-                            {/* Model */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Bike className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -115,7 +111,6 @@ export default function AddMotoForm() {
                                 />
                             </div>
 
-                            {/* Màu xe */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Palette className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -130,7 +125,6 @@ export default function AddMotoForm() {
                                 />
                             </div>
 
-                            {/* Hãng xe */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Building2 className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -150,7 +144,6 @@ export default function AddMotoForm() {
                                 </select>
                             </div>
 
-                            {/* Chủ xe */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <User className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -173,7 +166,6 @@ export default function AddMotoForm() {
                             </div>
                         </div>
 
-                        {/* Buttons */}
                         <div className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-gray-100">
                             <button
                                 type="button"

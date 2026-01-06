@@ -25,7 +25,6 @@ export default function Statistics() {
     const [stats, setStats] = useState(null);
     const [monthlyData, setMonthlyData] = useState([]);
 
-    // Toggle visibility for lines
     const [visibleLines, setVisibleLines] = useState({
         ordersIncome: true,
         repairsIncome: true,
@@ -43,7 +42,6 @@ export default function Statistics() {
         getStatistics(params).then(setStats);
     }, [type, month, year, quarter]);
 
-    // Fetch monthly data for line chart when viewing by year
     useEffect(() => {
         if (type === "year") {
             const fetchMonthlyData = async () => {
@@ -90,7 +88,6 @@ export default function Statistics() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Hero Header */}
             <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
                 <div className="max-w-6xl mx-auto px-4 py-8">
                     <div className="flex flex-col items-center text-center">
@@ -103,10 +100,8 @@ export default function Statistics() {
                 </div>
             </div>
 
-            {/* Stats Cards */}
             <div className="max-w-6xl mx-auto px-4 -mt-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Total Income */}
                     <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl p-6 text-white shadow-xl">
                         <div className="flex items-center gap-3 mb-2">
                             <DollarSign className="w-8 h-8 opacity-80" />
@@ -115,7 +110,6 @@ export default function Statistics() {
                         <div className="text-3xl font-bold">{formatCurrency(totalIncome)} ₫</div>
                     </div>
 
-                    {/* Orders */}
                     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
@@ -127,7 +121,6 @@ export default function Statistics() {
                         <div className="text-sm text-cyan-600 font-medium mt-1">{formatCurrency(stats?.ordersIncome ?? 0)} ₫</div>
                     </div>
 
-                    {/* Repairs */}
                     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
                         <div className="flex items-center gap-3 mb-2">
                             <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
@@ -141,7 +134,6 @@ export default function Statistics() {
                 </div>
             </div>
 
-            {/* Filters */}
             <div className="max-w-6xl mx-auto px-4 mt-6">
                 <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
                     <div className="flex flex-wrap gap-3 items-center">
@@ -190,10 +182,8 @@ export default function Statistics() {
                 </div>
             </div>
 
-            {/* Charts */}
             <div className="max-w-6xl mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Line Chart with Toggles */}
                     <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -202,15 +192,14 @@ export default function Statistics() {
                             </h3>
                         </div>
 
-                        {/* Toggle Buttons */}
                         <div className="flex flex-wrap gap-2 mb-4">
                             {lineConfigs.map(config => (
                                 <button
                                     key={config.key}
                                     onClick={() => toggleLine(config.key)}
                                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${visibleLines[config.key]
-                                            ? "text-white shadow"
-                                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                                        ? "text-white shadow"
+                                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                                         }`}
                                     style={visibleLines[config.key] ? { backgroundColor: config.color } : {}}
                                 >
@@ -257,7 +246,6 @@ export default function Statistics() {
                         </ResponsiveContainer>
                     </div>
 
-                    {/* Pie Chart */}
                     <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                         <h3 className="text-lg font-bold text-gray-800 mb-4">Tỉ lệ số lượng</h3>
                         <ResponsiveContainer width="100%" height={250}>

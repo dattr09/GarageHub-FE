@@ -41,7 +41,6 @@ export default function RepairOrderList() {
     const formatDate = (date) => new Date(date).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
     const formatPrice = (price) => new Intl.NumberFormat("vi-VN").format(price || 0);
 
-    // Stats
     const stats = Object.keys(STATUS_CONFIG).map(key => ({
         ...STATUS_CONFIG[key],
         key,
@@ -50,7 +49,6 @@ export default function RepairOrderList() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Hero Header */}
             <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
                 <div className="max-w-7xl mx-auto px-4 py-8">
                     <div className="flex flex-col items-center text-center">
@@ -70,7 +68,6 @@ export default function RepairOrderList() {
                 </div>
             </div>
 
-            {/* Stats */}
             <div className="max-w-7xl mx-auto px-4 -mt-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {stats.map((stat) => (
@@ -85,7 +82,6 @@ export default function RepairOrderList() {
                 </div>
             </div>
 
-            {/* Filters */}
             <div className="max-w-7xl mx-auto px-4 mt-4">
                 <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
                     <div className="flex flex-wrap gap-3 items-center justify-between">
@@ -108,7 +104,6 @@ export default function RepairOrderList() {
                             />
                         </div>
 
-                        {/* View Mode Toggle */}
                         <div className="flex bg-gray-100 rounded-xl p-1">
                             <button
                                 onClick={() => setViewMode("grid")}
@@ -127,7 +122,6 @@ export default function RepairOrderList() {
                 </div>
             </div>
 
-            {/* Orders */}
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {loading ? (
                     <div className="text-center py-16">
@@ -147,7 +141,6 @@ export default function RepairOrderList() {
                                     key={order._id}
                                     className="group bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all overflow-hidden"
                                 >
-                                    {/* Header */}
                                     <div className={`px-5 py-3 border-b ${status.color}`}>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
@@ -158,7 +151,6 @@ export default function RepairOrderList() {
                                         </div>
                                     </div>
 
-                                    {/* Content */}
                                     <div className="p-5">
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-3">
@@ -184,7 +176,6 @@ export default function RepairOrderList() {
                                             </div>
                                         </div>
 
-                                        {/* Actions */}
                                         <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
                                             <button
                                                 onClick={() => navigate(`/repair-orders/${order._id}`)}
@@ -207,7 +198,6 @@ export default function RepairOrderList() {
                         })}
                     </div>
                 ) : (
-                    // List View
                     <div className="space-y-3">
                         {filteredOrders.map((order) => {
                             const status = getStatus(order.status);
@@ -216,13 +206,11 @@ export default function RepairOrderList() {
                                     key={order._id}
                                     className="bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all p-4 flex flex-wrap gap-4 items-center"
                                 >
-                                    {/* Status + ID */}
                                     <div className={`px-3 py-1 rounded-full text-sm font-medium border ${status.color}`}>
                                         {status.label}
                                     </div>
                                     <span className="font-mono text-gray-500">#{order.orderId}</span>
 
-                                    {/* Info */}
                                     <div className="flex-1 min-w-0 grid grid-cols-2 md:grid-cols-3 gap-4">
                                         <div>
                                             <p className="text-xs text-gray-400">Khách hàng</p>
@@ -238,7 +226,6 @@ export default function RepairOrderList() {
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => navigate(`/repair-orders/${order._id}`)}

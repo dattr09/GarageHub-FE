@@ -14,10 +14,9 @@ export default function HomePage() {
     const [userToken, setUserToken] = useState(null);
 
     useEffect(() => {
-        // Lấy thông tin user từ localStorage
         const storedUserId = localStorage.getItem("userId");
         const storedToken = localStorage.getItem("token");
-        
+
         if (storedUserId) setUserId(storedUserId);
         if (storedToken) setUserToken(storedToken);
     }, []);
@@ -41,8 +40,7 @@ export default function HomePage() {
             <ServiceCards />
             <Accessories parts={parts} />
             <FeaturedProducts parts={parts} brands={brands} />
-            
-            {/* Chat Widget - chỉ hiển thị khi user đã đăng nhập */}
+
             {userId && userToken && (
                 <ChatWidget userId={userId} userToken={userToken} />
             )}

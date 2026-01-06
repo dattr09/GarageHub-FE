@@ -19,7 +19,6 @@ export default function Header() {
     const managementDropdownRef = useRef(null);
     const searchRef = useRef(null);
 
-    // Fetch all parts for search suggestions
     useEffect(() => {
         const fetchParts = async () => {
             try {
@@ -50,7 +49,6 @@ export default function Header() {
             const clickedInside = refs.some(ref => ref && ref.contains(e.target));
             if (!clickedInside) setOpen(null);
 
-            // Close suggestions if clicked outside search
             if (searchRef.current && !searchRef.current.contains(e.target)) {
                 setShowSuggestions(false);
             }
@@ -86,7 +84,6 @@ export default function Header() {
         };
     }, []);
 
-    // Handle search input and update suggestions
     const handleSearchInput = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
@@ -103,7 +100,6 @@ export default function Header() {
         }
     };
 
-    // Handle selecting a suggestion
     const handleSelectSuggestion = (part) => {
         setSearchTerm(part.name);
         setShowSuggestions(false);
@@ -113,8 +109,11 @@ export default function Header() {
     const handleLogout = async () => {
         try {
             await api.post("/auth/logout");
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            localStorage.removeItem("userId");
             setUser(null);
-            navigate("/login");
+            navigate("/");
         } catch (error) { console.error("Lỗi đăng xuất:", error); }
     };
 
@@ -131,12 +130,10 @@ export default function Header() {
     return (
         <nav className="fixed top-0 left-0 right-0 w-screen bg-gradient-to-r from-sky-100 via-blue-50 to-cyan-100 z-50 px-4 md:px-8 py-2.5">
             <div className="flex items-center gap-4 flex-nowrap">
-                {/* Logo */}
                 <Link to="/" className="flex-shrink-0">
                     <img src="/logo_garagehub.png" alt="Logo" className="h-10 w-10 rounded-full" />
                 </Link>
 
-                {/* Search with suggestions */}
                 <div ref={searchRef} className="relative flex-shrink-0 hidden sm:block" style={{ width: 260 }}>
                     <form onSubmit={handleSearch}>
                         <div className="relative">
@@ -161,7 +158,6 @@ export default function Header() {
                         </div>
                     </form>
 
-                    {/* Suggestions dropdown */}
                     {showSuggestions && suggestions.length > 0 && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-[100]">
                             {suggestions.map((part) => (
@@ -184,39 +180,32 @@ export default function Header() {
                     )}
                 </div>
 
-                {/* Navigation Links - Single Row */}
                 <div className="flex items-center gap-1 flex-nowrap flex-1 justify-center">
-                    {/* Trang chủ */}
                     <Link to="/" className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition text-base font-medium whitespace-nowrap">
                         <Home className="w-5 h-5" />
                         <span>Trang chủ</span>
                     </Link>
 
-                    {/* Hãng xe */}
                     <Link to="/brands" className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition text-base font-medium whitespace-nowrap">
                         <Tag className="w-5 h-5" />
                         <span>Hãng xe</span>
                     </Link>
 
-                    {/* Phụ tùng */}
                     <Link to="/parts" className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition text-base font-medium whitespace-nowrap">
                         <Package className="w-5 h-5" />
                         <span>Phụ tùng</span>
                     </Link>
 
-                    {/* Đặt lịch */}
                     <Link to="/appointments/book" className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition text-base font-medium whitespace-nowrap">
                         <Calendar className="w-5 h-5" />
                         <span>Đặt lịch</span>
                     </Link>
 
-                    {/* Tra cứu */}
                     <Link to="/appointments/search" className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition text-base font-medium whitespace-nowrap">
                         <Search className="w-5 h-5" />
                         <span>Tra cứu</span>
                     </Link>
 
-                    {/* Admin/Employee Only - Quản lý Dropdown */}
                     {isAdminOrEmployee && (
                         <div className="relative" ref={managementDropdownRef}>
                             <button
@@ -247,9 +236,7 @@ export default function Header() {
                     )}
                 </div>
 
-                {/* Right Side - Cart, Bell, User */}
                 <div className="flex items-center gap-3 flex-shrink-0">
-                    {/* Cart */}
                     <Link to="/cart" className="relative p-2 hover:bg-gray-100 rounded-lg transition">
                         <ShoppingCart className="w-5 h-5 text-gray-700" />
                         {cartCount > 0 && (
@@ -259,7 +246,6 @@ export default function Header() {
                         )}
                     </Link>
 
-                    {/* Bell for admin/employee */}
                     {isAdminOrEmployee && (
                         <Link to="/appointments?status=Chờ xác nhận" className="relative p-2 hover:bg-gray-100 rounded-lg transition">
                             <Bell className="w-5 h-5 text-gray-700" />
@@ -271,7 +257,6 @@ export default function Header() {
                         </Link>
                     )}
 
-                    {/* User */}
                     {!user ? (
                         <Link to="/login" className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition text-sm">
                             Đăng nhập

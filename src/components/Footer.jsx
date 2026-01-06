@@ -4,10 +4,8 @@ import { Mail, Phone, MapPin, Wrench, Facebook, Instagram, Youtube } from "lucid
 export default function Footer() {
     return (
         <footer className="bg-gradient-to-br from-sky-50 via-blue-100 to-cyan-50 text-gray-800 mt-auto">
-            {/* Main Footer */}
             <div className="max-w-7xl mx-auto px-4 py-10">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    {/* Brand */}
                     <div className="md:col-span-1">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
@@ -33,7 +31,6 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Quick Links */}
                     <div>
                         <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-4">Liên kết nhanh</h3>
                         <ul className="space-y-2">
@@ -44,7 +41,6 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Contact */}
                     <div>
                         <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-4">Liên hệ</h3>
                         <ul className="space-y-3">
@@ -75,7 +71,6 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Map */}
                     <div>
                         <h3 className="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-4">Địa chỉ</h3>
                         <div className="rounded-xl overflow-hidden border border-blue-200 h-40 shadow-sm">
@@ -94,7 +89,6 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* Bottom Bar */}
             <div className="border-t border-blue-200/50">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-2">
                     <p className="text-gray-500 text-xs">

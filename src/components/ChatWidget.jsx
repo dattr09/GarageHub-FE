@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Send, Image, X, MessageCircle } from "lucide-react";
-
-const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import Config from "../envVars";
 
 const ChatWidget = ({ userId, userToken }) => {
   const navigate = useNavigate();
@@ -42,7 +41,7 @@ const ChatWidget = ({ userId, userToken }) => {
 
   useEffect(() => {
     if (!userId || isAdmin) return;
-    const newSocket = io(`${SOCKET_URL}/chat`, { query: { userId, isAdmin: "false" }, transports: ["websocket"] });
+    const newSocket = io(`${Config.BACKEND_URL}/chat`, { query: { userId, isAdmin: "false" }, transports: ["websocket"] });
     newSocket.on("connect", () => { loadChatHistory(); });
     newSocket.on("receive-message", (message) => {
       setMessages((prev) => [...prev, message]);
@@ -61,13 +60,12 @@ const ChatWidget = ({ userId, userToken }) => {
   const loadChatHistory = async () => {
     try {
       const token = getToken();
-      const response = await fetch(`${SOCKET_URL}/api/v1/chat/messages/${conversationId}`, {
+      const response = await fetch(`${Config.BACKEND_URL}/api/v1/chat/messages/${conversationId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
       if (data.success) {
         setMessages(data.messages);
-        // Count unread messages from admin
         const unread = data.messages.filter(m => m.senderRole === "admin" && !m.isRead).length;
         setUnreadCount(unread);
       }
@@ -96,7 +94,7 @@ const ChatWidget = ({ userId, userToken }) => {
     selectedImages.forEach(img => formData.append("images", img.file));
     try {
       const token = getToken();
-      const response = await fetch(`${SOCKET_URL}/api/v1/chat/upload`, {
+      const response = await fetch(`${Config.BACKEND_URL}/api/v1/chat/upload`, {
         method: "POST", headers: { Authorization: `Bearer ${token}` }, body: formData,
       });
       const data = await response.json();
@@ -151,7 +149,6 @@ const ChatWidget = ({ userId, userToken }) => {
 
   return (
     <>
-      {/* Floating Button - Sky Blue Theme */}
       {!isOpen && (
         <button
           aria-label="Open chat"
@@ -168,12 +165,10 @@ const ChatWidget = ({ userId, userToken }) => {
         </button>
       )}
 
-      {/* Chat Window - Sky Blue Theme */}
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-[380px] h-[520px] rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[1000] border border-gray-200"
           style={{ maxWidth: "calc(100vw - 32px)", maxHeight: "calc(100vh - 100px)" }}>
 
-          {/* Header - Sky Blue Gradient */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 text-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
@@ -189,7 +184,6 @@ const ChatWidget = ({ userId, userToken }) => {
             </button>
           </div>
 
-          {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-gray-50 to-white">
             {messages.length === 0 && (
               <div className="text-center py-8">
@@ -236,7 +230,6 @@ const ChatWidget = ({ userId, userToken }) => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Image Preview */}
           {selectedImages.length > 0 && (
             <div className="p-2 bg-gray-50 flex gap-2 overflow-x-auto border-t border-gray-100">
               {selectedImages.map((img, i) => (
@@ -252,7 +245,6 @@ const ChatWidget = ({ userId, userToken }) => {
           )}
           {isUploading && <div className="p-2 bg-blue-50 text-center text-sm text-blue-600">Đang upload...</div>}
 
-          {/* Input - Blue Theme */}
           <form className="flex gap-2 p-3 bg-white border-t border-gray-100 items-center" onSubmit={handleSendMessage}>
             <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" multiple className="hidden" />
             <button type="button" onClick={() => fileInputRef.current?.click()}
@@ -269,7 +261,6 @@ const ChatWidget = ({ userId, userToken }) => {
         </div>
       )}
 
-      {/* Image Preview Modal */}
       {previewImage && (
         <div className="fixed inset-0 bg-black/80 z-[1100] flex items-center justify-center p-4" onClick={() => setPreviewImage(null)}>
           <img src={previewImage} alt="" className="max-w-full max-h-full rounded-2xl" />

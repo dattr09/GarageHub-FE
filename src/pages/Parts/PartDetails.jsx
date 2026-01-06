@@ -87,6 +87,7 @@ const PartDetails = () => {
     };
 
     const handleAddToCart = () => {
+
         if (!part || part.quantity <= 0) return;
 
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -136,7 +137,6 @@ const PartDetails = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Header */}
             <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
                 <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
                     <button
@@ -158,11 +158,9 @@ const PartDetails = () => {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="max-w-6xl mx-auto px-4 py-8">
                 <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
                     <div className="grid md:grid-cols-2 gap-0">
-                        {/* Image Section */}
                         <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 flex items-center justify-center">
                             <div className="relative w-full max-w-md aspect-square">
                                 <img
@@ -178,19 +176,15 @@ const PartDetails = () => {
                             </div>
                         </div>
 
-                        {/* Info Section */}
                         <div className="p-8">
-                            {/* Brand */}
                             <p className="text-blue-600 font-medium text-sm uppercase tracking-wide mb-2">
                                 {part.brandId?.name || "GarageHub"}
                             </p>
 
-                            {/* Name */}
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                                 {part.name}
                             </h1>
 
-                            {/* Rating */}
                             <div className="flex items-center gap-3 mb-6">
                                 {renderStars(averageRating, "w-5 h-5")}
                                 <span className="text-lg font-semibold text-gray-700">{averageRating.toFixed(1)}</span>
@@ -198,14 +192,12 @@ const PartDetails = () => {
                                 <span className="text-gray-500">{reviews.length} đánh giá</span>
                             </div>
 
-                            {/* Price */}
                             <div className="mb-6">
                                 <span className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                                     {formatPrice(part.price)}₫
                                 </span>
                             </div>
 
-                            {/* Details */}
                             <div className="space-y-3 mb-6 py-6 border-y border-gray-100">
                                 <div className="flex justify-between">
                                     <span className="text-gray-500">Đơn vị</span>
@@ -219,7 +211,6 @@ const PartDetails = () => {
                                 </div>
                             </div>
 
-                            {/* Quantity & Add to Cart */}
                             {part.quantity > 0 && (
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
@@ -240,7 +231,6 @@ const PartDetails = () => {
                                 </div>
                             )}
 
-                            {/* Action Buttons */}
                             <div className="flex gap-3">
                                 <button
                                     onClick={handleAddToCart}
@@ -255,7 +245,6 @@ const PartDetails = () => {
                                 </button>
                             </div>
 
-                            {/* Features */}
                             <div className="mt-6 flex gap-6 text-sm text-gray-500">
                                 <div className="flex items-center gap-2">
                                     <Check className="w-4 h-4 text-green-500" />
@@ -269,7 +258,6 @@ const PartDetails = () => {
                         </div>
                     </div>
 
-                    {/* Tabs */}
                     <div className="border-t border-gray-100">
                         <div className="flex gap-8 px-8">
                             {["info", "reviews"].map((tab) => (
@@ -294,7 +282,6 @@ const PartDetails = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    {/* Review Form */}
                                     {user && (
                                         <form onSubmit={handleSubmitReview} className="bg-gray-50 rounded-2xl p-6 mb-6">
                                             <h4 className="font-semibold text-gray-800 mb-4">Viết đánh giá của bạn</h4>
@@ -334,7 +321,6 @@ const PartDetails = () => {
                                         </form>
                                     )}
 
-                                    {/* Reviews List */}
                                     <div className="space-y-4">
                                         {reviews.length === 0 ? (
                                             <p className="text-center text-gray-400 py-8">Chưa có đánh giá nào</p>

@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { MessageSquare, Send, Image, X, RefreshCw, User } from "lucide-react";
-
-const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import Config from "../../envVars";
 
 const ChatManagement = ({ adminId, adminToken }) => {
   const [conversations, setConversations] = useState([]);
@@ -25,7 +24,7 @@ const ChatManagement = ({ adminId, adminToken }) => {
 
   useEffect(() => {
     if (!adminId) return;
-    const newSocket = io(`${SOCKET_URL}/chat`, {
+    const newSocket = io(`${Config.BACKEND_URL}/chat`, {
       query: { userId: adminId, isAdmin: "true" },
       transports: ["websocket"],
     });
@@ -48,7 +47,7 @@ const ChatManagement = ({ adminId, adminToken }) => {
 
   const loadConversations = async () => {
     try {
-      const res = await fetch(`${SOCKET_URL}/api/v1/chat/conversations`, { credentials: "include" });
+      const res = await fetch(`${Config.BACKEND_URL}/api/v1/chat/conversations`, { credentials: "include" });
       const data = await res.json();
       if (data.success) setConversations(data.conversations || []);
     } catch (err) { console.error("Error loading conversations:", err); }
@@ -56,7 +55,7 @@ const ChatManagement = ({ adminId, adminToken }) => {
 
   const loadMessages = async (conversationId) => {
     try {
-      const res = await fetch(`${SOCKET_URL}/api/v1/chat/messages/${conversationId}`, { credentials: "include" });
+      const res = await fetch(`${Config.BACKEND_URL}/api/v1/chat/messages/${conversationId}`, { credentials: "include" });
       const data = await res.json();
       if (data.success) setMessages(data.messages || []);
     } catch (err) { console.error("Error loading messages:", err); }
@@ -94,7 +93,7 @@ const ChatManagement = ({ adminId, adminToken }) => {
     selectedImages.forEach(img => formData.append("images", img.file));
     try {
       const token = getToken();
-      const response = await fetch(`${SOCKET_URL}/api/v1/chat/upload`, {
+      const response = await fetch(`${Config.BACKEND_URL}/api/v1/chat/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -168,7 +167,6 @@ const ChatManagement = ({ adminId, adminToken }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50 p-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 rounded-t-2xl text-white p-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
@@ -184,9 +182,7 @@ const ChatManagement = ({ adminId, adminToken }) => {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="bg-white rounded-b-2xl shadow-xl flex h-[600px] overflow-hidden">
-          {/* Sidebar */}
           <div className="w-80 border-r border-gray-100 flex flex-col">
             <div className="flex-1 overflow-y-auto">
               {conversations.length === 0 ? (
@@ -230,11 +226,9 @@ const ChatManagement = ({ adminId, adminToken }) => {
             </div>
           </div>
 
-          {/* Chat Window */}
           <div className="flex-1 flex flex-col">
             {selectedConversation ? (
               <>
-                {/* Chat Header */}
                 <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                     <User className="w-5 h-5 text-white" />
@@ -245,7 +239,6 @@ const ChatManagement = ({ adminId, adminToken }) => {
                   </div>
                 </div>
 
-                {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
                   {messages.map((msg, idx) => {
                     const isAdmin = msg.senderRole === "admin";
@@ -283,7 +276,6 @@ const ChatManagement = ({ adminId, adminToken }) => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Image Preview */}
                 {selectedImages.length > 0 && (
                   <div className="p-2 bg-gray-100 flex gap-2 overflow-x-auto">
                     {selectedImages.map((img, i) => (
@@ -300,7 +292,6 @@ const ChatManagement = ({ adminId, adminToken }) => {
 
                 {isUploading && <div className="p-2 bg-blue-50 text-center text-sm text-blue-600">Đang upload...</div>}
 
-                {/* Input */}
                 <form className="flex gap-2 p-4 border-t border-gray-100 items-center" onSubmit={handleSendMessage}>
                   <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" multiple className="hidden" />
                   <button type="button" onClick={() => fileInputRef.current?.click()}
@@ -325,7 +316,6 @@ const ChatManagement = ({ adminId, adminToken }) => {
         </div>
       </div>
 
-      {/* Image Preview Modal */}
       {previewImage && (
         <div className="fixed inset-0 bg-black/80 z-[1100] flex items-center justify-center p-4" onClick={() => setPreviewImage(null)}>
           <img src={previewImage} alt="" className="max-w-full max-h-full rounded-2xl" />

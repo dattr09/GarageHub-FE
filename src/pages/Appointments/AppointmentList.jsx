@@ -71,7 +71,6 @@ export default function AppointmentList() {
     return dateMatch && statusMatch;
   });
 
-  // Stats
   const stats = STATUS_OPTIONS.filter(o => o.value).map(opt => ({
     ...opt,
     count: appointments.filter(a => a.status === opt.value).length
@@ -79,7 +78,6 @@ export default function AppointmentList() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-      {/* Hero Header */}
       <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col items-center text-center">
@@ -92,7 +90,6 @@ export default function AppointmentList() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="max-w-7xl mx-auto px-4 -mt-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {stats.map((stat) => (
@@ -111,11 +108,9 @@ export default function AppointmentList() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="max-w-7xl mx-auto px-4 mt-4">
         <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
           <div className="flex flex-wrap gap-3 items-center justify-between">
-            {/* Date filter */}
             <div className="flex gap-3 items-center">
               <input
                 type="date"
@@ -134,7 +129,6 @@ export default function AppointmentList() {
               </select>
             </div>
 
-            {/* View Mode Toggle */}
             <div className="flex bg-gray-100 rounded-xl p-1">
               <button
                 onClick={() => setViewMode("grid")}
@@ -153,7 +147,6 @@ export default function AppointmentList() {
         </div>
       </div>
 
-      {/* Appointments */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         {loading ? (
           <div className="text-center py-16">
@@ -171,7 +164,6 @@ export default function AppointmentList() {
                 key={apt._id}
                 className="bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all overflow-hidden"
               >
-                {/* Header */}
                 <div className={`px-5 py-3 border-b ${STATUS_COLORS[apt.status] || "bg-gray-100"}`}>
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">{apt.status}</span>
@@ -179,7 +171,6 @@ export default function AppointmentList() {
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="p-5">
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
@@ -216,7 +207,6 @@ export default function AppointmentList() {
                     </div>
                   </div>
 
-                  {/* Status Change */}
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <select
                       value={apt.status}
@@ -233,19 +223,16 @@ export default function AppointmentList() {
             ))}
           </div>
         ) : (
-          // List View
           <div className="space-y-3">
             {filteredAppointments.map((apt) => (
               <div
                 key={apt._id}
                 className="bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all p-4 flex flex-wrap gap-4 items-center"
               >
-                {/* Status Badge */}
                 <div className={`px-3 py-1 rounded-full text-sm font-medium border ${STATUS_COLORS[apt.status] || "bg-gray-100"}`}>
                   {apt.status}
                 </div>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0 grid grid-cols-2 md:grid-cols-5 gap-4">
                   <div>
                     <p className="text-xs text-gray-400">Khách hàng</p>
@@ -269,7 +256,6 @@ export default function AppointmentList() {
                   </div>
                 </div>
 
-                {/* Actions */}
                 <select
                   value={apt.status}
                   onChange={e => handleStatusChange(apt._id, e.target.value)}

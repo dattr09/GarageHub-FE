@@ -108,7 +108,6 @@ export default function RepairOrderAdd() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
                 <div className="max-w-5xl mx-auto px-4 py-8">
                     <div className="flex flex-col items-center text-center">
@@ -123,14 +122,11 @@ export default function RepairOrderAdd() {
                 </div>
             </div>
 
-            {/* Form */}
             <div className="max-w-5xl mx-auto px-4 -mt-4 pb-8">
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                     <form onSubmit={handleSubmit} className="p-6 md:p-8">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            {/* Left Column */}
                             <div className="space-y-5">
-                                {/* Customer */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <User className="w-4 h-4 inline mr-2 text-blue-500" />
@@ -152,7 +148,6 @@ export default function RepairOrderAdd() {
                                     </select>
                                 </div>
 
-                                {/* Repair Costs */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <DollarSign className="w-4 h-4 inline mr-2 text-green-500" />
@@ -169,7 +164,6 @@ export default function RepairOrderAdd() {
                                     />
                                 </div>
 
-                                {/* Status */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <ClipboardList className="w-4 h-4 inline mr-2 text-blue-500" />
@@ -187,7 +181,6 @@ export default function RepairOrderAdd() {
                                     </select>
                                 </div>
 
-                                {/* Payment Method */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <CreditCard className="w-4 h-4 inline mr-2 text-purple-500" />
@@ -211,7 +204,6 @@ export default function RepairOrderAdd() {
                                     </div>
                                 </div>
 
-                                {/* Notes */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         <FileText className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -228,7 +220,6 @@ export default function RepairOrderAdd() {
                                 </div>
                             </div>
 
-                            {/* Right Column - Parts */}
                             <div>
                                 <div className="flex items-center justify-between mb-3">
                                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -288,7 +279,6 @@ export default function RepairOrderAdd() {
                             </div>
                         </div>
 
-                        {/* Summary */}
                         <div className="mt-8 pt-6 border-t border-gray-100">
                             <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 max-w-md ml-auto">
                                 <div className="space-y-2">
@@ -308,7 +298,6 @@ export default function RepairOrderAdd() {
                             </div>
                         </div>
 
-                        {/* Buttons */}
                         <div className="flex items-center justify-center gap-4 mt-8">
                             <button
                                 type="button"

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { AuthAPI } from "../services/api";
-import { toast } from "react-hot-toast";
 import { FaUser, FaPhone, FaMapMarkerAlt, FaEnvelope, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const containerVariants = {
@@ -11,16 +10,16 @@ const containerVariants = {
         opacity: 1,
         x: 0,
         transition: {
-            staggerChildren: 0.12,
-            delayChildren: 0.1,
+            staggerChildren: 0.08,
+            delayChildren: 0.05,
         },
     },
     exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
 };
 
 const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
 };
 
 const RegisterPage = () => {
@@ -54,7 +53,6 @@ const RegisterPage = () => {
 
             if (response.status === 201) {
                 setSuccessMsg(response.data.message || "Đăng ký thành công!");
-                toast.success(response.data.message, { duration: 3000 });
                 localStorage.setItem("emailForVerification", email);
                 setTimeout(() => {
                     setSuccessMsg("");
@@ -63,12 +61,18 @@ const RegisterPage = () => {
             }
         } catch (error) {
             setErrorMsg("Đăng ký thất bại!");
-            toast.error("Đăng ký thất bại!");
             setTimeout(() => setErrorMsg(""), 3000);
         } finally {
             setLoading(false);
         }
     };
+
+    const inputClass = (field) => `w-full px-4 py-2.5 border rounded-xl transition-all duration-300 bg-gray-50 text-sm
+        ${focusField === field
+            ? "border-cyan-500 ring-2 ring-cyan-200 bg-white"
+            : "border-gray-200 hover:border-gray-300"
+        }
+        placeholder-gray-400 outline-none`;
 
     return (
         <motion.div
@@ -76,7 +80,7 @@ const RegisterPage = () => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="w-full px-8 py-4 relative"
+            className="w-full px-8 py-3 relative"
         >
             <AnimatePresence>
                 {successMsg && (
@@ -84,10 +88,10 @@ const RegisterPage = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-blue-200 text-green-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-green-200 text-green-700 px-6 py-3 rounded-xl shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
                         style={{ minWidth: 280, maxWidth: "90vw" }}
                     >
-                        <FaCheckCircle className="text-green-700 text-2xl" />
+                        <FaCheckCircle className="text-green-500 text-xl" />
                         <span className="truncate text-center">{successMsg}</span>
                     </motion.div>
                 )}
@@ -96,201 +100,130 @@ const RegisterPage = () => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-red-200 text-red-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-red-200 text-red-700 px-6 py-3 rounded-xl shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
                         style={{ minWidth: 280, maxWidth: "90vw" }}
                     >
-                        <FaTimesCircle className="text-red-500 text-2xl" />
+                        <FaTimesCircle className="text-red-500 text-xl" />
                         <span className="truncate text-center">{errorMsg}</span>
                     </motion.div>
                 )}
             </AnimatePresence>
             <motion.h2
                 variants={itemVariants}
-                className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow"
+                className="text-2xl font-bold text-gray-800 text-center mb-5 tracking-wide"
             >
-                Đăng ký
+                Đăng ký tài khoản
             </motion.h2>
             <motion.form
                 variants={itemVariants}
                 onSubmit={handleRegister}
-                className="space-y-4"
+                className="space-y-3"
             >
+                {/* Họ tên */}
                 <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Nhập họ và tên"
+                            placeholder="Họ và tên"
                             required
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             onFocus={() => setFocusField("fullName")}
                             onBlur={() => setFocusField("")}
-                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                                ${focusField === "fullName"
-                                    ? "border-blue-500 ring-2 ring-blue-200"
-                                    : "border-gray-300 focus:border-blue-400"
-                                }
-                                placeholder-gray-400 outline-none`}
+                            className={inputClass("fullName")}
                         />
-                        <motion.span
-                            initial={false}
-                            animate={{
-                                opacity: focusField === "fullName" ? 1 : 0,
-                                x: focusField === "fullName" ? 0 : -10,
-                            }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
-                            transition={{ duration: 0.2 }}
-                        >
-                            <FaUser />
-                        </motion.span>
+                        <FaUser className={`absolute right-4 top-1/2 -translate-y-1/2 text-lg pointer-events-none transition-colors ${focusField === "fullName" ? "text-cyan-500" : "text-gray-300"}`} />
                     </div>
                 </motion.div>
+                {/* Ngày sinh */}
                 <motion.div variants={itemVariants}>
-                    <div className="relative">
-                        <input
-                            type="date"
-                            required
-                            value={dateOfBirth}
-                            onChange={(e) => setDateOfBirth(e.target.value)}
-                            onFocus={() => setFocusField("dateOfBirth")}
-                            onBlur={() => setFocusField("")}
-                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                                ${focusField === "dateOfBirth"
-                                    ? "border-blue-500 ring-2 ring-blue-200"
-                                    : "border-gray-300 focus:border-blue-400"
-                                }
-                                placeholder-gray-400 outline-none`}
-                        />
-                    </div>
+                    <input
+                        type="date"
+                        required
+                        value={dateOfBirth}
+                        onChange={(e) => setDateOfBirth(e.target.value)}
+                        onFocus={() => setFocusField("dateOfBirth")}
+                        onBlur={() => setFocusField("")}
+                        className={inputClass("dateOfBirth")}
+                    />
                 </motion.div>
+                {/* Số điện thoại */}
                 <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Nhập số điện thoại"
+                            placeholder="Số điện thoại"
                             required
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
                             onFocus={() => setFocusField("phoneNumber")}
                             onBlur={() => setFocusField("")}
-                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                                ${focusField === "phoneNumber"
-                                    ? "border-blue-500 ring-2 ring-blue-200"
-                                    : "border-gray-300 focus:border-blue-400"
-                                }
-                                placeholder-gray-400 outline-none`}
+                            className={inputClass("phoneNumber")}
                         />
-                        <motion.span
-                            initial={false}
-                            animate={{
-                                opacity: focusField === "phoneNumber" ? 1 : 0,
-                                x: focusField === "phoneNumber" ? 0 : -10,
-                            }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
-                            transition={{ duration: 0.2 }}
-                        >
-                            <FaPhone />
-                        </motion.span>
+                        <FaPhone className={`absolute right-4 top-1/2 -translate-y-1/2 text-lg pointer-events-none transition-colors ${focusField === "phoneNumber" ? "text-cyan-500" : "text-gray-300"}`} />
                     </div>
                 </motion.div>
+                {/* Địa chỉ */}
                 <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Nhập địa chỉ"
+                            placeholder="Địa chỉ"
                             required
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                             onFocus={() => setFocusField("address")}
                             onBlur={() => setFocusField("")}
-                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                                ${focusField === "address"
-                                    ? "border-blue-500 ring-2 ring-blue-200"
-                                    : "border-gray-300 focus:border-blue-400"
-                                }
-                                placeholder-gray-400 outline-none`}
+                            className={inputClass("address")}
                         />
-                        <motion.span
-                            initial={false}
-                            animate={{
-                                opacity: focusField === "address" ? 1 : 0,
-                                x: focusField === "address" ? 0 : -10,
-                            }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
-                            transition={{ duration: 0.2 }}
-                        >
-                            <FaMapMarkerAlt />
-                        </motion.span>
+                        <FaMapMarkerAlt className={`absolute right-4 top-1/2 -translate-y-1/2 text-lg pointer-events-none transition-colors ${focusField === "address" ? "text-cyan-500" : "text-gray-300"}`} />
                     </div>
                 </motion.div>
+                {/* Email */}
                 <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type="email"
-                            placeholder="Nhập email"
+                            placeholder="Email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             onFocus={() => setFocusField("email")}
                             onBlur={() => setFocusField("")}
-                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                                ${focusField === "email"
-                                    ? "border-blue-500 ring-2 ring-blue-200"
-                                    : "border-gray-300 focus:border-blue-400"
-                                }
-                                placeholder-gray-400 outline-none`}
+                            className={inputClass("email")}
                         />
-                        <motion.span
-                            initial={false}
-                            animate={{
-                                opacity: focusField === "email" ? 1 : 0,
-                                x: focusField === "email" ? 0 : -10,
-                            }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 text-xl pointer-events-none"
-                            transition={{ duration: 0.2 }}
-                        >
-                            <FaEnvelope />
-                        </motion.span>
+                        <FaEnvelope className={`absolute right-4 top-1/2 -translate-y-1/2 text-lg pointer-events-none transition-colors ${focusField === "email" ? "text-cyan-500" : "text-gray-300"}`} />
                     </div>
                 </motion.div>
+                {/* Mật khẩu */}
                 <motion.div variants={itemVariants}>
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
-                            placeholder="Nhập mật khẩu"
+                            placeholder="Mật khẩu"
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             onFocus={() => setFocusField("password")}
                             onBlur={() => setFocusField("")}
-                            className={`w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm
-                                ${focusField === "password"
-                                    ? "border-blue-500 ring-2 ring-blue-200"
-                                    : "border-gray-300 focus:border-blue-400"
-                                }
-                                placeholder-gray-400 outline-none`}
+                            className={inputClass("password")}
                         />
                         <span
-                            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer text-lg hover:text-gray-600 transition-colors"
                             onClick={() => setShowPassword((v) => !v)}
                             tabIndex={0}
                             role="button"
-                            aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-                            style={{ padding: 0 }}
                         >
-                            {showPassword ? (
-                                <FaEyeSlash />
-                            ) : (
-                                <FaEye />
-                            )}
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
                     </div>
                 </motion.div>
-                <motion.div variants={itemVariants}>
+                {/* Nút đăng ký */}
+                <motion.div variants={itemVariants} className="pt-2">
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 text-lg tracking-wide flex items-center justify-center gap-2
+                        className={`cursor-pointer w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-base flex items-center justify-center gap-2
                         ${loading ? "opacity-60 cursor-not-allowed" : ""}`}
                     >
                         {loading ? "Đang đăng ký..." : "Đăng ký"}
@@ -300,12 +233,12 @@ const RegisterPage = () => {
 
             <motion.div
                 variants={itemVariants}
-                className="mt-8 text-center"
+                className="mt-6 text-center"
             >
-                <span className="text-gray-600 text-base">Đã có tài khoản?</span>
+                <span className="text-gray-500 text-sm">Đã có tài khoản?</span>
                 <button
                     onClick={() => navigate("/login")}
-                    className="ml-2 text-blue-700 hover:underline font-semibold cursor-pointer text-base"
+                    className="ml-2 text-cyan-600 hover:text-cyan-700 hover:underline font-semibold cursor-pointer text-sm transition-colors"
                     type="button"
                 >
                     Đăng nhập

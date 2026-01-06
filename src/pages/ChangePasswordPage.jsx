@@ -1,27 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthAPI } from "../services/api";
-import { toast } from "react-hot-toast";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaLock, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-
-const containerVariants = {
-    hidden: { opacity: 0, x: 50 },
-    visible: {
-        opacity: 1,
-        x: 0,
-        transition: {
-            staggerChildren: 0.12,
-            delayChildren: 0.1,
-        },
-    },
-    exit: { opacity: 0, x: -50, transition: { duration: 0.3 } },
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
+import { FaLock, FaEye, FaEyeSlash, FaCheckCircle, FaTimesCircle, FaCheck, FaTimes } from "react-icons/fa";
 
 const ChangePasswordPage = () => {
     const [newPassword, setNewPassword] = useState("");
@@ -39,7 +20,7 @@ const ChangePasswordPage = () => {
         { test: (password) => password.length >= 8, message: "Ít nhất 8 ký tự" },
         { test: (password) => /[A-Z]/.test(password), message: "Ít nhất một chữ hoa" },
         { test: (password) => /[0-9]/.test(password), message: "Ít nhất một chữ số" },
-        { test: (password) => /[!@#$%^&*]/.test(password), message: "Ít nhất một ký tự đặc biệt (!@#$%^&*)" },
+        { test: (password) => /[!@#$%^&*]/.test(password), message: "Ít nhất một ký tự đặc biệt" },
     ];
 
     const handleChangePassword = async (e) => {
@@ -48,17 +29,17 @@ const ChangePasswordPage = () => {
         setSuccessMsg("");
         setErrorMsg("");
 
-        // Kiểm tra tất cả điều kiện bảo mật
         const unmetConditions = passwordConditions.filter((condition) => !condition.test(newPassword));
         if (unmetConditions.length > 0) {
-            toast.error("Mật khẩu chưa đáp ứng đủ điều kiện bảo mật!");
+            setErrorMsg("Mật khẩu chưa đáp ứng đủ điều kiện bảo mật!");
+            setTimeout(() => setErrorMsg(""), 3000);
             setLoading(false);
             return;
         }
 
-        // Kiểm tra mật khẩu xác nhận
         if (newPassword !== confirmPassword) {
-            toast.error("Mật khẩu xác nhận không khớp!");
+            setErrorMsg("Mật khẩu xác nhận không khớp!");
+            setTimeout(() => setErrorMsg(""), 3000);
             setLoading(false);
             return;
         }
@@ -69,14 +50,12 @@ const ChangePasswordPage = () => {
                 { headers: { Authorization: `Bearer ${resetToken}` } }
             );
             setSuccessMsg(response.data.message || "Đổi mật khẩu thành công!");
-            toast.success(response.data.message);
             setTimeout(() => {
                 setSuccessMsg("");
                 navigate("/login");
             }, 2000);
         } catch (error) {
             setErrorMsg(error.response?.data?.message || "Có lỗi xảy ra!");
-            toast.error(error.response?.data?.message || "Có lỗi xảy ra!");
             setTimeout(() => setErrorMsg(""), 3000);
         } finally {
             setLoading(false);
@@ -84,171 +63,144 @@ const ChangePasswordPage = () => {
     };
 
     return (
-        <>
-            <style>
-                {`
-          @keyframes gradient-x {
-            0%, 100% {
-              background-position: 0% 50%;
-            }
-            50% {
-              background-position: 100% 50%;
-            }
-          }
-          .animate-gradient-x {
-            background-size: 200% 200%;
-            animation: gradient-x 6s ease-in-out infinite;
-          }
-        `}
-            </style>
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
+            <AnimatePresence>
+                {successMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-green-200 text-green-700 px-6 py-3 rounded-xl shadow-xl font-semibold text-sm flex items-center gap-2"
+                    >
+                        <FaCheckCircle className="text-green-500 text-xl" />
+                        <span>{successMsg}</span>
+                    </motion.div>
+                )}
+                {errorMsg && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-red-200 text-red-700 px-6 py-3 rounded-xl shadow-xl font-semibold text-sm flex items-center gap-2"
+                    >
+                        <FaTimesCircle className="text-red-500 text-xl" />
+                        <span>{errorMsg}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 via-indigo-200 via-cyan-100 to-blue-200 animate-gradient-x">
-                <AnimatePresence>
-                    {successMsg && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-blue-200 text-green-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
-                            style={{ minWidth: 280, maxWidth: "90vw" }}
-                        >
-                            <FaCheckCircle className="text-green-700 text-2xl" />
-                            <span className="truncate text-center">{successMsg}</span>
-                        </motion.div>
-                    )}
-                    {errorMsg && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white border border-red-200 text-red-700 px-6 py-3 rounded-lg shadow-xl font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap"
-                            style={{ minWidth: 280, maxWidth: "90vw" }}
-                        >
-                            <FaTimesCircle className="text-red-500 text-2xl" />
-                            <span className="truncate text-center">{errorMsg}</span>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="w-full max-w-md bg-white rounded-lg shadow-lg p-6"
-                >
-                    <motion.h2
-                        variants={itemVariants}
-                        className="text-3xl font-extrabold text-blue-800 text-center mb-8 tracking-wide drop-shadow"
-                    >
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 p-8"
+            >
+                {/* Header */}
+                <div className="flex flex-col items-center mb-8">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4 shadow-lg">
+                        <FaLock className="text-white text-2xl" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-800 text-center">
                         Đổi mật khẩu
-                    </motion.h2>
-                    <motion.form
-                        variants={itemVariants}
-                        onSubmit={handleChangePassword}
-                        className="space-y-4"
-                    >
-                        {/* Mật khẩu mới */}
-                        <motion.div variants={itemVariants}>
-                            <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
-                                Mật khẩu mới
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={showNewPassword ? "text" : "password"}
-                                    required
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    placeholder="Nhập mật khẩu mới"
-                                    className="w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm border-gray-300 focus:border-blue-400 placeholder-gray-400 outline-none"
-                                />
-                                <span
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
-                                    onClick={() => setShowNewPassword((v) => !v)}
-                                    tabIndex={0}
-                                    role="button"
-                                    aria-label={showNewPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-                                >
-                                    {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                                </span>
-                            </div>
-                            <ul className="mt-2 text-sm">
-                                {passwordConditions.map((condition, index) => (
-                                    <li key={index} className="flex items-center">
-                                        {condition.test(newPassword) ? (
-                                            <span className="text-green-500 mr-2">✔</span>
-                                        ) : (
-                                            <span className="text-red-500 mr-2">✖</span>
-                                        )}
-                                        <span>{condition.message}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </motion.div>
-                        {/* Xác nhận mật khẩu */}
-                        <motion.div variants={itemVariants}>
-                            <label className="block font-semibold text-gray-700 mb-2 text-lg tracking-wide">
-                                Xác nhận mật khẩu
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    required
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Nhập lại mật khẩu mới"
-                                    className="w-full px-5 py-3 border-2 rounded-lg transition-all duration-300 bg-white text-base shadow-sm border-gray-300 focus:border-blue-400 placeholder-gray-400 outline-none"
-                                />
-                                <span
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer text-lg"
-                                    onClick={() => setShowConfirmPassword((v) => !v)}
-                                    tabIndex={0}
-                                    role="button"
-                                    aria-label={showConfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-                                >
-                                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                                </span>
-                            </div>
-                        </motion.div>
-                        {/* Nút đổi mật khẩu */}
-                        <motion.div variants={itemVariants}>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className={`cursor-pointer w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold rounded-lg shadow-lg transition-all duration-300 text-lg tracking-wide flex items-center justify-center gap-2 ${loading ? "opacity-60 cursor-not-allowed" : ""
-                                    }`}
+                    </h2>
+                    <p className="text-gray-500 text-sm text-center mt-2">
+                        Tạo mật khẩu mới cho tài khoản
+                    </p>
+                </div>
+
+                <form onSubmit={handleChangePassword} className="space-y-5">
+                    {/* Mật khẩu mới */}
+                    <div>
+                        <label className="block font-medium text-gray-700 mb-2 text-sm">
+                            Mật khẩu mới
+                        </label>
+                        <div className="relative">
+                            <input
+                                type={showNewPassword ? "text" : "password"}
+                                required
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="Nhập mật khẩu mới"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl transition-all duration-300 bg-gray-50 text-base focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 focus:bg-white placeholder-gray-400 outline-none"
+                            />
+                            <span
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer text-lg hover:text-gray-600 transition-colors"
+                                onClick={() => setShowNewPassword((v) => !v)}
                             >
-                                {loading ? (
-                                    <>
-                                        <svg
-                                            className="animate-spin h-6 w-6 text-white"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <circle
-                                                className="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                strokeWidth="4"
-                                            ></circle>
-                                            <path
-                                                className="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                            ></path>
-                                        </svg>
-                                        Đang gửi...
-                                    </>
+                                {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                            </span>
+                        </div>
+                        {/* Password strength indicators */}
+                        <ul className="mt-3 space-y-1">
+                            {passwordConditions.map((condition, index) => (
+                                <li key={index} className="flex items-center gap-2 text-sm">
+                                    {condition.test(newPassword) ? (
+                                        <FaCheck className="text-green-500 text-xs" />
+                                    ) : (
+                                        <FaTimes className="text-gray-300 text-xs" />
+                                    )}
+                                    <span className={condition.test(newPassword) ? "text-green-600" : "text-gray-400"}>
+                                        {condition.message}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Xác nhận mật khẩu */}
+                    <div>
+                        <label className="block font-medium text-gray-700 mb-2 text-sm">
+                            Xác nhận mật khẩu
+                        </label>
+                        <div className="relative">
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                required
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Nhập lại mật khẩu mới"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl transition-all duration-300 bg-gray-50 text-base focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 focus:bg-white placeholder-gray-400 outline-none"
+                            />
+                            <span
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer text-lg hover:text-gray-600 transition-colors"
+                                onClick={() => setShowConfirmPassword((v) => !v)}
+                            >
+                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                            </span>
+                        </div>
+                        {confirmPassword && (
+                            <p className={`mt-2 text-sm flex items-center gap-1 ${newPassword === confirmPassword ? "text-green-600" : "text-red-500"}`}>
+                                {newPassword === confirmPassword ? (
+                                    <><FaCheck className="text-xs" /> Mật khẩu khớp</>
                                 ) : (
-                                    "Đổi mật khẩu"
+                                    <><FaTimes className="text-xs" /> Mật khẩu không khớp</>
                                 )}
-                            </button>
-                        </motion.div>
-                    </motion.form>
-                </motion.div>
-            </div>
-        </>
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Nút đổi mật khẩu */}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-base flex items-center justify-center gap-2 ${loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                            }`}
+                    >
+                        {loading ? (
+                            <>
+                                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                </svg>
+                                Đang xử lý...
+                            </>
+                        ) : (
+                            "Đổi mật khẩu"
+                        )}
+                    </button>
+                </form>
+            </motion.div>
+        </div>
     );
 };
 

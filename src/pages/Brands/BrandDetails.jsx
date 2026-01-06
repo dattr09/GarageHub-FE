@@ -73,7 +73,6 @@ const BrandDetails = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Header */}
             <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
                 <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
                     <button
@@ -95,12 +94,9 @@ const BrandDetails = () => {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="max-w-6xl mx-auto px-4 py-8">
-                {/* Brand Info */}
                 <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-8">
                     <div className="p-8 flex flex-col md:flex-row items-center gap-8">
-                        {/* Brand Image */}
                         <div className="w-32 h-32 md:w-40 md:h-40 bg-white rounded-2xl border border-gray-100 flex items-center justify-center overflow-hidden shadow-lg">
                             <img
                                 src={getBackendImgURL(brand.image)}
@@ -109,7 +105,6 @@ const BrandDetails = () => {
                             />
                         </div>
 
-                        {/* Brand Info */}
                         <div className="text-center md:text-left">
                             <p className="text-blue-600 font-medium text-sm uppercase tracking-wide mb-2">Thương hiệu</p>
                             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{brand.name}</h1>
@@ -118,7 +113,6 @@ const BrandDetails = () => {
                     </div>
                 </div>
 
-                {/* Parts from this brand */}
                 <div className="bg-white rounded-2xl shadow-lg p-6">
                     <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                         <Package className="w-5 h-5 text-blue-500" />
@@ -138,7 +132,6 @@ const BrandDetails = () => {
                                     className="group bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all overflow-hidden cursor-pointer"
                                     onClick={() => navigate(`/parts/${part._id}`)}
                                 >
-                                    {/* Image */}
                                     <div className="aspect-square bg-white p-3 border-b border-gray-50">
                                         <img
                                             src={getBackendImgURL(part.image)}
@@ -147,7 +140,6 @@ const BrandDetails = () => {
                                         />
                                     </div>
 
-                                    {/* Info */}
                                     <div className="p-3">
                                         <h4 className="font-medium text-gray-800 text-sm line-clamp-2 mb-2">{part.name}</h4>
                                         <div className="flex items-center gap-1.5 mb-2">

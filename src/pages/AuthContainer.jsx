@@ -27,12 +27,12 @@ export default function AuthContainer() {
         `}
       </style>
 
-      <div className="flex items-center justify-center w-full min-h-screen animate-gradient-x bg-gradient-to-br from-blue-500 via-indigo-200 via-cyan-100 to-blue-200">
-        <div className="relative bg-white/60 backdrop-blur-md rounded-2xl shadow-xl overflow-hidden max-w-4xl min-h-[650px] w-full">
+      <div className="flex items-center justify-center w-full min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
+        <div className="relative bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-100 overflow-hidden max-w-4xl min-h-[650px] w-full">
           <motion.div
             className="hidden md:flex flex-col items-center justify-center absolute top-0 left-0 h-full w-1/2 z-10
-              bg-gradient-to-br from-blue-500 via-indigo-400 via-cyan-300 to-blue-200
-              animate-gradient-x text-white px-10 py-12"
+              bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500
+              text-white px-10 py-12"
             initial={false}
             animate={{
               x: isRegister ? "100%" : "0%",

@@ -1,6 +1,5 @@
-import api from "./api"; // Sử dụng module `api` để gọi API
+import api from "./api";
 
-// Lấy danh sách phụ tùng
 export const getAllParts = async () => {
     try {
         const response = await api.get("/parts");
@@ -11,7 +10,6 @@ export const getAllParts = async () => {
     }
 };
 
-// Lấy phụ tùng theo ID
 export const getPartById = async (id) => {
     try {
         const response = await api.get(`/parts/${id}`);
@@ -22,7 +20,6 @@ export const getPartById = async (id) => {
     }
 };
 
-// Thêm phụ tùng mới
 export const createPart = async (formData) => {
     try {
         const token = localStorage.getItem("token");
@@ -39,7 +36,6 @@ export const createPart = async (formData) => {
     }
 };
 
-// Cập nhật phụ tùng
 export const updatePart = async (id, formData) => {
     try {
         const token = localStorage.getItem("token");
@@ -56,7 +52,6 @@ export const updatePart = async (id, formData) => {
     }
 };
 
-// Xóa phụ tùng
 export const deletePart = async (id, token) => {
     try {
         const response = await api.delete(`/parts/${id}`, {
@@ -71,7 +66,6 @@ export const deletePart = async (id, token) => {
     }
 };
 
-// Lấy phụ tùng theo thương hiệu
 export const getPartsByBrand = async (brandId) => {
     try {
         const response = await api.get(`/parts/${brandId}/parts`);
@@ -82,18 +76,16 @@ export const getPartsByBrand = async (brandId) => {
     }
 };
 
-// Hàm cập nhật tồn kho sản phẩm
 export const updatePartQuantity = async (partId, quantity) => {
     try {
         const response = await api.patch(`/parts/${partId}/quantity`, { quantity });
         return response.data;
     } catch (error) {
-        console.error("Lỗi khi cập nhật tồn kho sản phẩm:", error.response?.data || error.message);
+        console.error("Error updating part quantity:", error.response?.data || error.message);
         throw error;
     }
 };
 
-// Lấy danh sách đánh giá của phụ tùng
 export const getPartReviews = async (partId) => {
     try {
         const response = await api.get(`/parts/${partId}/reviews`);
@@ -104,7 +96,6 @@ export const getPartReviews = async (partId) => {
     }
 };
 
-// Tạo đánh giá mới cho phụ tùng
 export const createPartReview = async (partId, reviewData) => {
     try {
         const token = localStorage.getItem("token");

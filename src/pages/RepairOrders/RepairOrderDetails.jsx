@@ -52,7 +52,6 @@ export default function RepairOrderDetails() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Header */}
             <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
                 <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
                     <button
@@ -72,9 +71,7 @@ export default function RepairOrderDetails() {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="max-w-5xl mx-auto px-4 py-8">
-                {/* Order Header Card */}
                 <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-6">
                     <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 p-6 text-white">
                         <div className="flex items-center justify-between">
@@ -89,7 +86,6 @@ export default function RepairOrderDetails() {
                         </div>
                     </div>
 
-                    {/* Info Grid */}
                     <div className="p-6">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                             <div className="bg-gray-50 rounded-2xl p-4">
@@ -124,7 +120,6 @@ export default function RepairOrderDetails() {
                     </div>
                 </div>
 
-                {/* Parts Table */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
                     <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                         <Package className="w-5 h-5 text-blue-500" />
@@ -158,10 +153,8 @@ export default function RepairOrderDetails() {
                     </div>
                 </div>
 
-                {/* Summary */}
                 <div className="bg-white rounded-2xl shadow-lg p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Notes */}
                         <div>
                             <h3 className="text-sm font-medium text-gray-500 mb-2 flex items-center gap-2">
                                 <FileText className="w-4 h-4" />
@@ -170,7 +163,6 @@ export default function RepairOrderDetails() {
                             <p className="text-gray-800 bg-gray-50 rounded-xl p-4">{order.notes || <span className="text-gray-400 italic">Không có ghi chú</span>}</p>
                         </div>
 
-                        {/* Totals */}
                         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6">
                             <div className="space-y-3">
                                 <div className="flex justify-between">

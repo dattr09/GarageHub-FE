@@ -4,6 +4,7 @@ import { createOrder } from "../services/OrderApi";
 import { ShoppingBag, Mail, Phone, MapPin, FileText, User, CreditCard, ArrowLeft, Truck } from "lucide-react";
 import { cities } from "../data/cities";
 import { getBackendImgURL } from "../utils/helper";
+import Swal from "sweetalert2";
 
 export default function Checkout() {
     const navigate = useNavigate();
@@ -12,28 +13,57 @@ export default function Checkout() {
     });
     const [cart, setCart] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
         const userId = localStorage.getItem("userId");
-        if (!userId) {
-            alert("Bạn cần đăng nhập để thanh toán!");
-            navigate("/login");
-        } else {
-            const userStr = localStorage.getItem("user");
-            let name = "", email = "", phone = "";
-            if (userStr) {
-                try {
-                    const user = JSON.parse(userStr);
-                    name = user.name || user.fullName || "";
-                    email = user.email || "";
-                    phone = user.phone || "";
-                } catch { }
-            }
-            setInfo((info) => ({ ...info, name, phone, email }));
-            const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-            setCart(storedCart);
+        const userStr = localStorage.getItem("user");
+        if (!userId || !userStr) {
+            setIsChecking(false);
+            setIsAuthenticated(false);
+            Swal.fire({
+                icon: "info",
+                title: "Vui lòng đăng nhập",
+                text: "Bạn cần đăng nhập để thanh toán",
+                confirmButtonText: "Đăng nhập",
+                confirmButtonColor: "#3b82f6",
+                showCancelButton: true,
+                cancelButtonText: "Quay lại giỏ hàng",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigate("/login");
+                } else {
+                    navigate("/cart");
+                }
+            });
+            return;
         }
+        setIsAuthenticated(true);
+        setIsChecking(false);
+
+        let name = "", email = "", phone = "";
+        try {
+            const user = JSON.parse(userStr);
+            name = user.name || user.fullName || "";
+            email = user.email || "";
+            phone = user.phone || "";
+        } catch { }
+
+        setInfo((info) => ({ ...info, name, phone, email }));
+        const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        setCart(storedCart);
     }, [navigate]);
+
+    if (isChecking || !isAuthenticated) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50 flex items-center justify-center">
+                <div className="text-gray-500">Đang kiểm tra đăng nhập...</div>
+            </div>
+        );
+    }
 
     const handleChange = (e) => {
         const { name, value } = e.target;

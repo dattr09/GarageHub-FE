@@ -108,7 +108,6 @@ export default function BookAppointment() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-      {/* Header */}
       <div className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="flex flex-col items-center text-center">
@@ -121,11 +120,9 @@ export default function BookAppointment() {
         </div>
       </div>
 
-      {/* Form */}
       <div className="max-w-3xl mx-auto px-4 -mt-4 pb-8">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           <form onSubmit={handleSubmit} className="p-6 md:p-8">
-            {/* Thông tin khách hàng */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <User className="w-5 h-5 text-blue-500" />
@@ -176,7 +173,6 @@ export default function BookAppointment() {
               </div>
             </div>
 
-            {/* Thông tin đặt lịch */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-green-500" />
@@ -244,7 +240,6 @@ export default function BookAppointment() {
               </div>
             </div>
 
-            {/* Dịch vụ */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <Wrench className="w-5 h-5 text-orange-500" />
@@ -275,7 +270,6 @@ export default function BookAppointment() {
               </div>
             </div>
 
-            {/* Ghi chú */}
             <div className="mb-8">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FileText className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -291,7 +285,6 @@ export default function BookAppointment() {
               />
             </div>
 
-            {/* Submit */}
             <div className="flex justify-center">
               <button
                 type="submit"

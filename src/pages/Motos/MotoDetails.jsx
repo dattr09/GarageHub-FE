@@ -60,7 +60,6 @@ export default function MotoDetails() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Header */}
             <div className="bg-white border-b border-gray-100 sticky top-0 z-20">
                 <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
                     <button
@@ -82,19 +81,15 @@ export default function MotoDetails() {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-                    {/* License Plate Hero */}
                     <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 p-8 text-white text-center">
                         <p className="text-white/70 text-sm uppercase tracking-wider mb-2">Biển số xe</p>
                         <h1 className="text-5xl font-bold tracking-widest">{moto.licensePlate}</h1>
                     </div>
 
-                    {/* Info Grid */}
                     <div className="p-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Model */}
                             <div className="bg-gray-50 rounded-2xl p-5 flex items-center gap-4">
                                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                                     <Bike className="w-6 h-6 text-blue-600" />
@@ -105,7 +100,6 @@ export default function MotoDetails() {
                                 </div>
                             </div>
 
-                            {/* Color */}
                             <div className="bg-gray-50 rounded-2xl p-5 flex items-center gap-4">
                                 <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
                                     <Palette className="w-6 h-6 text-pink-600" />
@@ -116,7 +110,6 @@ export default function MotoDetails() {
                                 </div>
                             </div>
 
-                            {/* Brand */}
                             <div className="bg-gray-50 rounded-2xl p-5 flex items-center gap-4">
                                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
                                     <Building2 className="w-6 h-6 text-purple-600" />
@@ -127,7 +120,6 @@ export default function MotoDetails() {
                                 </div>
                             </div>
 
-                            {/* Owner */}
                             <div className="bg-gray-50 rounded-2xl p-5 flex items-center gap-4">
                                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                                     <User className="w-6 h-6 text-green-600" />

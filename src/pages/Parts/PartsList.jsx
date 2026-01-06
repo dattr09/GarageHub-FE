@@ -19,7 +19,6 @@ const PartsList = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Check if user is admin
     useEffect(() => {
         try {
             const userStr = localStorage.getItem("user");
@@ -130,6 +129,7 @@ const PartsList = () => {
     };
 
     const handleAddToCart = (part) => {
+
         if (!part.quantity || part.quantity <= 0) {
             Swal.fire({
                 icon: "warning",
@@ -180,7 +180,6 @@ const PartsList = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Hero Header */}
             <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
                 <div className="max-w-7xl mx-auto px-4 py-8">
                     <div className="flex flex-col items-center text-center">
@@ -202,11 +201,9 @@ const PartsList = () => {
                 </div>
             </div>
 
-            {/* Filters */}
             <div className="max-w-7xl mx-auto px-4 -mt-4">
                 <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
                     <div className="flex flex-wrap gap-3 items-center">
-                        {/* Search */}
                         <div className="flex-1 min-w-[200px] relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
@@ -218,7 +215,6 @@ const PartsList = () => {
                             />
                         </div>
 
-                        {/* Brand Filter */}
                         <div className="relative min-w-[160px]">
                             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <select
@@ -234,7 +230,6 @@ const PartsList = () => {
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                         </div>
 
-                        {/* Sort */}
                         <div className="relative min-w-[140px]">
                             <select
                                 value={sortOrder}
@@ -251,7 +246,6 @@ const PartsList = () => {
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                         </div>
 
-                        {/* View Mode Toggle */}
                         <div className="flex bg-gray-100 rounded-xl p-1">
                             <button
                                 onClick={() => setViewMode("grid")}
@@ -270,7 +264,6 @@ const PartsList = () => {
                 </div>
             </div>
 
-            {/* Products */}
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {filteredParts.length === 0 ? (
                     <div className="text-center py-16">
@@ -284,7 +277,6 @@ const PartsList = () => {
                                 key={part._id}
                                 className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300"
                             >
-                                {/* Image */}
                                 <div
                                     className="relative aspect-square bg-white p-4 cursor-pointer border-b border-gray-50"
                                     onClick={() => navigate(`/parts/${part._id}`)}
@@ -317,14 +309,11 @@ const PartsList = () => {
                                     )}
                                 </div>
 
-                                {/* Info */}
                                 <div className="p-3">
-                                    {/* Brand */}
                                     <p className="text-xs text-blue-600 font-medium mb-1 truncate">
                                         {part.brandId?.name || "GarageHub"}
                                     </p>
 
-                                    {/* Name */}
                                     <h3
                                         className="font-semibold text-gray-800 text-sm line-clamp-2 mb-2 cursor-pointer hover:text-blue-600"
                                         onClick={() => navigate(`/parts/${part._id}`)}
@@ -332,7 +321,6 @@ const PartsList = () => {
                                         {part.name}
                                     </h3>
 
-                                    {/* Rating */}
                                     <div className="flex items-center gap-1.5 mb-2">
                                         {renderStars(part.averageRating)}
                                         <span className="text-xs text-gray-500">
@@ -340,7 +328,6 @@ const PartsList = () => {
                                         </span>
                                     </div>
 
-                                    {/* Price & Stock */}
                                     <div className="flex items-center justify-between mb-3">
                                         <span className="text-lg font-bold text-blue-600">
                                             {formatPrice(part.price)}₫
@@ -350,7 +337,6 @@ const PartsList = () => {
                                         </span>
                                     </div>
 
-                                    {/* Add to Cart */}
                                     <button
                                         onClick={() => handleAddToCart(part)}
                                         disabled={part.quantity <= 0}
@@ -364,14 +350,12 @@ const PartsList = () => {
                         ))}
                     </div>
                 ) : (
-                    // List View
                     <div className="space-y-3">
                         {filteredParts.map((part) => (
                             <div
                                 key={part._id}
                                 className="group bg-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-lg transition-all p-4 flex gap-4"
                             >
-                                {/* Image */}
                                 <div
                                     className="w-24 h-24 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden cursor-pointer"
                                     onClick={() => navigate(`/parts/${part._id}`)}
@@ -379,7 +363,6 @@ const PartsList = () => {
                                     <img src={getBackendImgURL(part.image)} alt={part.name} className="w-full h-full object-contain" />
                                 </div>
 
-                                {/* Info */}
                                 <div className="flex-1 min-w-0">
                                     <h3
                                         className="font-semibold text-gray-800 cursor-pointer hover:text-blue-600 truncate"
@@ -400,7 +383,6 @@ const PartsList = () => {
                                     </div>
                                 </div>
 
-                                {/* Actions */}
                                 <div className="flex flex-col gap-2">
                                     <button
                                         onClick={() => handleAddToCart(part)}

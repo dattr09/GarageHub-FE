@@ -79,7 +79,6 @@ export default function SearchAppointment() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-      {/* Header */}
       <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="flex flex-col items-center text-center">
@@ -92,7 +91,6 @@ export default function SearchAppointment() {
         </div>
       </div>
 
-      {/* Search Box */}
       <div className="max-w-3xl mx-auto px-4 -mt-4">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
           <div className="flex gap-3">
@@ -119,7 +117,6 @@ export default function SearchAppointment() {
         </div>
       </div>
 
-      {/* Results */}
       <div className="max-w-3xl mx-auto px-4 py-6">
         {searched && (
           <>
@@ -141,7 +138,6 @@ export default function SearchAppointment() {
                     key={apt._id}
                     className="bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all overflow-hidden"
                   >
-                    {/* Status Header */}
                     <div className={`px-5 py-3 border-b ${STATUS_COLORS[apt.status] || "bg-gray-100"}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -152,7 +148,6 @@ export default function SearchAppointment() {
                       </div>
                     </div>
 
-                    {/* Content */}
                     <div className="p-5">
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="flex items-center gap-3">

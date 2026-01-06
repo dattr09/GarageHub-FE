@@ -100,7 +100,6 @@ const AddPartForm = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
                 <div className="max-w-4xl mx-auto px-4 py-8">
                     <div className="flex flex-col items-center text-center">
@@ -113,11 +112,9 @@ const AddPartForm = () => {
                 </div>
             </div>
 
-            {/* Form */}
             <div className="max-w-4xl mx-auto px-4 -mt-4 pb-8">
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                     <form onSubmit={handleSubmit} className="p-6 md:p-8">
-                        {/* Image Upload */}
                         <div className="flex justify-center mb-8">
                             <label className="cursor-pointer group">
                                 <div className={`w-36 h-36 rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden transition-all ${imagePreview ? "border-blue-400" : "border-gray-300 group-hover:border-blue-400"}`}>
@@ -135,7 +132,6 @@ const AddPartForm = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                            {/* Tên */}
                             <div className="md:col-span-2 lg:col-span-3">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Tag className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -150,7 +146,6 @@ const AddPartForm = () => {
                                 />
                             </div>
 
-                            {/* Giá nhập */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <DollarSign className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -166,7 +161,6 @@ const AddPartForm = () => {
                                 />
                             </div>
 
-                            {/* Giá nhân viên */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <DollarSign className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -182,7 +176,6 @@ const AddPartForm = () => {
                                 />
                             </div>
 
-                            {/* Giá bán */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <DollarSign className="w-4 h-4 inline mr-2 text-green-500" />
@@ -198,7 +191,6 @@ const AddPartForm = () => {
                                 />
                             </div>
 
-                            {/* Số lượng */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Layers className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -214,7 +206,6 @@ const AddPartForm = () => {
                                 />
                             </div>
 
-                            {/* Đơn vị */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Archive className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -229,7 +220,6 @@ const AddPartForm = () => {
                                 />
                             </div>
 
-                            {/* Giới hạn tồn kho */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Layers className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -245,7 +235,6 @@ const AddPartForm = () => {
                                 />
                             </div>
 
-                            {/* Thương hiệu */}
                             <div className="md:col-span-2 lg:col-span-3">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     <Tag className="w-4 h-4 inline mr-2 text-gray-400" />
@@ -265,7 +254,6 @@ const AddPartForm = () => {
                             </div>
                         </div>
 
-                        {/* Buttons */}
                         <div className="flex items-center justify-center gap-4 mt-8 pt-6 border-t border-gray-100">
                             <button
                                 type="button"

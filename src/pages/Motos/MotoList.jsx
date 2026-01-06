@@ -77,7 +77,6 @@ export default function MotoList() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-sky-50">
-            {/* Hero Header */}
             <div className="bg-gradient-to-r from-blue-500 via-blue-600 to-cyan-500 text-white">
                 <div className="max-w-7xl mx-auto px-4 py-8">
                     <div className="flex flex-col items-center text-center">
@@ -99,11 +98,9 @@ export default function MotoList() {
                 </div>
             </div>
 
-            {/* Filters */}
             <div className="max-w-7xl mx-auto px-4 -mt-4">
                 <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
                     <div className="flex flex-wrap gap-3 items-center justify-between">
-                        {/* Search */}
                         <div className="flex-1 min-w-[200px] relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
@@ -115,7 +112,6 @@ export default function MotoList() {
                             />
                         </div>
 
-                        {/* View Mode Toggle */}
                         <div className="flex bg-gray-100 rounded-xl p-1">
                             <button
                                 onClick={() => setViewMode("grid")}
@@ -134,7 +130,6 @@ export default function MotoList() {
                 </div>
             </div>
 
-            {/* Motos */}
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {loading ? (
                     <div className="text-center py-16">
@@ -152,7 +147,6 @@ export default function MotoList() {
                                 key={moto._id || moto.licensePlate}
                                 className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300"
                             >
-                                {/* Header with license plate */}
                                 <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 text-white relative">
                                     <div className="text-center">
                                         <p className="text-xs text-white/70 uppercase tracking-wide mb-1">Biển số xe</p>
@@ -176,7 +170,6 @@ export default function MotoList() {
                                     )}
                                 </div>
 
-                                {/* Info */}
                                 <div className="p-4">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-3">
@@ -221,19 +214,16 @@ export default function MotoList() {
                         ))}
                     </div>
                 ) : (
-                    // List View
                     <div className="space-y-3">
                         {filteredMotos.map((moto) => (
                             <div
                                 key={moto._id || moto.licensePlate}
                                 className="group bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all p-4 flex gap-4 items-center"
                             >
-                                {/* License Plate Badge */}
                                 <div className="w-24 h-16 flex-shrink-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white font-bold">
                                     {moto.licensePlate}
                                 </div>
 
-                                {/* Info */}
                                 <div className="flex-1 min-w-0 grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div>
                                         <p className="text-xs text-gray-400">Mẫu xe</p>
@@ -253,7 +243,6 @@ export default function MotoList() {
                                     </div>
                                 </div>
 
-                                {/* Actions */}
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => navigate(`/motos/${moto.licensePlate}`)}

@@ -11,13 +11,13 @@ export const getAllBrands = async () => {
 };
 
 export const getBrandById = async (brandId) => {
-  try {
-    const response = await api.get(`/brands/${brandId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching brand by ID:", error);
-    throw error;
-  }
+    try {
+        const response = await api.get(`/brands/${brandId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching brand:", error);
+        throw error;
+    }
 };
 
 export const createBrand = async (formData) => {
